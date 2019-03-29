@@ -47,6 +47,7 @@ public class StringTest {
 		jedis.decrBy("test2", 1);
 		Common.keys(jedis);
 
+		// none(key不存在),string(字符串),list(列表),set(集合),zset(有序集),hash(哈希表)
 		String type = jedis.type("test2");
 		System.out.println(type);
 
