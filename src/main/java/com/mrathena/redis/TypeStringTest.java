@@ -5,7 +5,7 @@ import redis.clients.jedis.Jedis;
 /**
  * @author mrathena on 2019/3/29 15:54
  */
-public class StringTest {
+public class TypeStringTest {
 
 	public static Jedis preTest() {
 		Jedis jedis = new Jedis(Common.HOST, Common.PORT);
