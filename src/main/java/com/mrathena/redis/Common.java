@@ -15,9 +15,27 @@ public class Common {
 	/**
 	 * //列出所有的key
 	 */
-	public static void keys(Jedis jedis) {
+	public static void print(Jedis jedis) {
 		Set<String> keys = jedis.keys("*");
-		keys.forEach(item -> System.out.println(item + ": " + jedis.get(item)));
+		keys.forEach(item -> {
+			System.out.print("Key:" + item + ": ");
+			String type = jedis.type(item);
+			switch (type) {
+				case "string":
+					System.out.println("Value:" + jedis.get(item));
+					break;
+				case "list":
+					System.out.print("Size:" + jedis.llen(item) + " ");
+					System.out.println("Value:" + jedis.lrange(item, 0, jedis.llen(item) - 1));
+					break;
+				case "set":
+					System.out.print("Size:" + jedis.scard(item) + " ");
+					System.out.println("Value:" + jedis.smembers(item));
+					break;
+				default:
+					System.out.println(type);
+			}
+		});
 		System.out.println();
 	}
 

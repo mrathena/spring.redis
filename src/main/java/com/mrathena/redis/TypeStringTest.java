@@ -14,7 +14,7 @@ public class TypeStringTest {
 		jedis.set("test", "test");
 		jedis.set("test2", "1");
 
-		Common.keys(jedis);
+		Common.print(jedis);
 
 		return jedis;
 	}
@@ -25,34 +25,34 @@ public class TypeStringTest {
 
 		jedis.set("key1", "value1");
 		jedis.set("key2", "value2");
-		Common.keys(jedis);
+		Common.print(jedis);
 
 		//将值value关联到key，并将key的生存时间设为seconds(秒)。
 		jedis.setex("foo", 1, "foo");
-		Common.keys(jedis);
+		Common.print(jedis);
 		Thread.sleep(1000);
-		Common.keys(jedis);
+		Common.print(jedis);
 
 		jedis.del("test");
 		jedis.del("key1", "key2");
-		Common.keys(jedis);
+		Common.print(jedis);
 
 		jedis.incr("test2");
-		Common.keys(jedis);
+		Common.print(jedis);
 		jedis.incrBy("test2", 10);
-		Common.keys(jedis);
+		Common.print(jedis);
 
 		jedis.decr("test2");
-		Common.keys(jedis);
+		Common.print(jedis);
 		jedis.decrBy("test2", 1);
-		Common.keys(jedis);
+		Common.print(jedis);
 
 		// none(key不存在),string(字符串),list(列表),set(集合),zset(有序集),hash(哈希表)
 		String type = jedis.type("test2");
 		System.out.println(type);
 
 		jedis.flushAll();
-		Common.keys(jedis);
+		Common.print(jedis);
 
 		jedis.disconnect();
 
