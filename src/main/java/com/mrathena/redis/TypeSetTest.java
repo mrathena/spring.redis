@@ -11,9 +11,9 @@ public class TypeSetTest {
 		Jedis jedis = new Jedis(Common.HOST, Common.PORT);
 		jedis.connect();
 
+		jedis.sadd("test", "3");
 		jedis.sadd("test", "1");
 		jedis.sadd("test", "2");
-		jedis.sadd("test", "3");
 		jedis.sadd("test", "4");
 		jedis.sadd("test", "4");
 		jedis.sadd("test", "6", "6", "6");
