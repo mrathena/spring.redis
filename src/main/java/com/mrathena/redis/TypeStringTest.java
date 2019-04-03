@@ -24,6 +24,7 @@ public class TypeStringTest {
 
 		Jedis jedis = preTest();
 
+		// setnx,setex,psetex三个命令可能后面被移除,使用下面4种方式替代
 		// 存在才set
 		jedis.set("key", "value", SetParams.setParams().xx());
 		// 不存在才set
@@ -32,6 +33,7 @@ public class TypeStringTest {
 		jedis.set("key", "value", SetParams.setParams().ex(1));
 		// set同时1000毫秒过期
 		jedis.set("key", "value", SetParams.setParams().px(1000));
+
 		jedis.set("key1", "value1");
 		jedis.set("key1", "value2");
 		jedis.set("key2", "value2");
