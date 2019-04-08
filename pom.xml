@@ -23,18 +23,24 @@
 				<artifactId>spring-data-redis</artifactId>
 				<version>2.1.5.RELEASE</version>
 			</dependency>
-			<!-- Jedis -->
+			<!-- jedis -->
 			<dependency>
 				<groupId>redis.clients</groupId>
 				<artifactId>jedis</artifactId>
 				<!--<version>2.9.0</version>-->
 				<version>3.0.1</version>
 			</dependency>
-			<!-- Fastjson -->
+			<!-- fastjson -->
 			<dependency>
 				<groupId>com.alibaba</groupId>
 				<artifactId>fastjson</artifactId>
 				<version>1.2.56</version>
+			</dependency>
+			<!-- kryo -->
+			<dependency>
+				<groupId>com.esotericsoftware</groupId>
+				<artifactId>kryo-shaded</artifactId>
+				<version>4.0.2</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -60,6 +66,17 @@
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
 		</dependency>
+		<!-- Kryo -->
+		<dependency>
+			<groupId>com.esotericsoftware</groupId>
+			<artifactId>kryo-shaded</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.mrathena</groupId>
+			<artifactId>toolkit</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -78,7 +95,6 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
-
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
