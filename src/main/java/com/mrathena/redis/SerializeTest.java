@@ -24,7 +24,7 @@ public class SerializeTest {
 		Jedis jedis = new Jedis(Common.HOST, Common.PORT);
 		jedis.connect();
 
-
+		// ----------------------------------------------------------------
 		// 序列化测试
 		Base base = getBase();
 		System.out.println(base);
@@ -83,7 +83,7 @@ public class SerializeTest {
 		System.out.println(newBase);
 		System.out.println();
 
-
+		// ----------------------------------------------------------------
 		// 组合对象测试
 		Complex complex = getComplex();
 
@@ -138,7 +138,7 @@ public class SerializeTest {
 //		System.out.println(newComplex);
 		System.out.println();
 
-
+		// ----------------------------------------------------------------
 		List<Complex> complexList = new LinkedList<>();
 		complexList.add(getComplex());
 		complexList.add(getComplex());
