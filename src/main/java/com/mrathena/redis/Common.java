@@ -9,7 +9,7 @@ import java.util.Set;
  */
 public class Common {
 
-	public static final String HOST = "192.168.1.181";
+	public static final String HOST = "192.168.16.211";
 	public static final int PORT = 6379;
 
 	/**
