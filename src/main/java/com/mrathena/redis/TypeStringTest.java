@@ -29,6 +29,8 @@ public class TypeStringTest {
 		jedis.set("key", "value", SetParams.setParams().xx());
 		// 不存在才set
 		jedis.set("key", "value", SetParams.setParams().nx());
+		jedis.set("key", "value", SetParams.setParams().ex(1).nx());
+		jedis.set("key", "value", SetParams.setParams().px(1000).nx());
 		// set同时1秒过期
 		jedis.set("key", "value", SetParams.setParams().ex(1));
 		// set同时1000毫秒过期
