@@ -55,7 +55,7 @@ public class SerializeTest {
 
 		// json默认序列化
 		start = System.nanoTime();
-		bytes = JSON.toJSONBytes(base);
+		bytes = JSON.toJSONString(base).getBytes();
 		interval = System.nanoTime() - start;
 		System.out.println("json serialize:" + interval + ", size:" + bytes.length);
 		// set
@@ -110,7 +110,7 @@ public class SerializeTest {
 
 		// json默认序列化
 		start = System.nanoTime();
-		bytes = JSON.toJSONBytes(complex);
+		bytes = JSON.toJSONString(complex).getBytes();
 		interval = System.nanoTime() - start;
 		System.out.println("json serialize:" + interval + ", size:" + bytes.length);
 		// set
