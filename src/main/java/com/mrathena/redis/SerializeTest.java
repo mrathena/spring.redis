@@ -36,51 +36,55 @@ public class SerializeTest {
 		Base newBase;
 		Complex newComplex;
 
-		key = serialize("base");
+		key = jdkSerialize("base");
 
 		// java默认序列化
 		start = System.nanoTime();
-		bytes = serialize(base);
+		bytes = jdkSerialize(base);
 		interval = System.nanoTime() - start;
-		System.out.println("jdk serialize:" + interval + ", size:" + bytes.length);
+		System.out.println("jdkSerialize: interval:" + interval + ", size:" + bytes.length);
 		// set
 		jedis.set(key, bytes);
 		// java默认反序列化
 		start = System.nanoTime();
-		newBase = deserialize(jedis.get(key), Base.class);
+		newBase = jdkDeserialize(jedis.get(key), Base.class);
 		interval = System.nanoTime() - start;
-		System.out.println("jdk deserialize:" + interval);
+		System.out.println("jdkDeserialize: interval:" + interval);
 		System.out.println(newBase);
 		System.out.println();
 
 		// json默认序列化
 		start = System.nanoTime();
-		bytes = JSON.toJSONString(base).getBytes();
+		bytes = jsonSerialize(base);
 		interval = System.nanoTime() - start;
-		System.out.println("json serialize:" + interval + ", size:" + bytes.length);
+		System.out.println("jsonSerialize: interval:" + interval + ", size:" + bytes.length);
 		// set
 		jedis.set(key, bytes);
 		// json默认反序列化
 		start = System.nanoTime();
-		newBase = JSON.parseObject(jedis.get(key), Base.class);
+		newBase = jsonDeserialize(jedis.get(key), Base.class);
 		interval = System.nanoTime() - start;
-		System.out.println("json deserialize:" + interval);
+		System.out.println("jsonDeserialize: interval:" + interval);
 		System.out.println(newBase);
 		System.out.println();
 
 		// kryo默认序列化
 		start = System.nanoTime();
-		bytes = KryoKit.writeToByteArray(base);
+		bytes = kryoSerialize(base);
 		interval = System.nanoTime() - start;
-		System.out.println("kryo serialize:" + interval + ", size:" + bytes.length);
+		System.out.println("kryoSerialize: interval:" + interval + ", size:" + bytes.length);
 		// set
 		jedis.set(key, bytes);
-		// java默认反序列化
+		// kryo默认反序列化
 		start = System.nanoTime();
-		newBase = KryoKit.readFromByteArray(jedis.get(key));
+		newBase = kryoDeserialize(jedis.get(key));
 		interval = System.nanoTime() - start;
-		System.out.println("kryo deserialize:" + interval);
+		System.out.println("kryoDeserialize: interval:" + interval);
 		System.out.println(newBase);
+		System.out.println();
+		System.out.println();
+		System.out.println();
+		System.out.println();
 		System.out.println();
 
 		// ----------------------------------------------------------------
@@ -90,52 +94,51 @@ public class SerializeTest {
 		System.out.println(complex);
 		System.out.println();
 
-		key = serialize("complex");
+		key = jdkSerialize("complex");
 
 		// java默认序列化
 		start = System.nanoTime();
-		bytes = serialize(complex);
+		bytes = jdkSerialize(complex);
 		interval = System.nanoTime() - start;
-		System.out.println("jdk serialize:" + interval + ", size:" + bytes.length);
+		System.out.println("jdkSerialize: interval:" + interval + ", size:" + bytes.length);
 		// set
 		jedis.set(key, bytes);
 		// java默认反序列化
 		start = System.nanoTime();
-		newComplex = deserialize(jedis.get(key), Complex.class);
-		System.out.println(newComplex.getLinkedHashMap());
+		newComplex = jdkDeserialize(jedis.get(key), Complex.class);
 		interval = System.nanoTime() - start;
-		System.out.println("jdk deserialize:" + interval);
+		System.out.println("jdkDeserialize: interval:" + interval);
 		System.out.println(newComplex);
 		System.out.println();
 
 		// json默认序列化
 		start = System.nanoTime();
-		bytes = JSON.toJSONString(complex).getBytes();
+		bytes = jsonSerialize(complex);
 		interval = System.nanoTime() - start;
-		System.out.println("json serialize:" + interval + ", size:" + bytes.length);
+		System.out.println("jsonSerialize: interval:" + interval + ", size:" + bytes.length);
 		// set
 		jedis.set(key, bytes);
 		// json默认反序列化
 		start = System.nanoTime();
-		newComplex = JSON.parseObject(jedis.get(key), Complex.class);
+		newComplex = jsonDeserialize(jedis.get(key), Complex.class);
 		interval = System.nanoTime() - start;
-		System.out.println("json deserialize:" + interval);
+		System.out.println("jsonDeserialize: interval:" + interval);
 		System.out.println(newComplex);
 		System.out.println();
 
 		// kryo默认序列化
 		start = System.nanoTime();
-		bytes = KryoKit.writeToByteArray(complex);
+		bytes = kryoSerialize(complex);
 		interval = System.nanoTime() - start;
-		System.out.println("kryo serialize:" + interval + ", size:" + bytes.length);
+		System.out.println("kryoSerialize: interval:" + interval + ", size:" + bytes.length);
 		// set
 		jedis.set(key, bytes);
-		// java默认反序列化
-//		start = System.nanoTime();
-//		newComplex = KryoKit.readFromByteArray(jedis.get(key));
-//		interval = System.nanoTime() - start;
-//		System.out.println("kryo deserialize:" + interval);
-//		System.out.println(newComplex);
+		// kryo默认反序列化
+		start = System.nanoTime();
+		newComplex = kryoDeserialize(jedis.get(key));
+		interval = System.nanoTime() - start;
+		System.out.println("kryoDeserialize: interval:" + interval);
+		System.out.println(newComplex);
 		System.out.println();
 
 		// ----------------------------------------------------------------
@@ -144,7 +147,7 @@ public class SerializeTest {
 		complexList.add(getComplex());
 		complexList.add(getComplex());
 		complexList.add(getComplex());
-		System.out.println(serialize(complexList).length);
+		System.out.println(jdkSerialize(complexList).length);
 		System.out.println(JSON.toJSONBytes(complexList).length);
 		System.out.println(KryoKit.writeToByteArray(complexList).length);
 		System.out.println(JSON.parseArray(JSON.toJSONString(complexList), Complex.class));
@@ -155,7 +158,7 @@ public class SerializeTest {
 		complexSet.add(getComplex());
 		complexSet.add(getComplex());
 		complexSet.add(getComplex());
-		System.out.println(serialize(complexSet).length);
+		System.out.println(jdkSerialize(complexSet).length);
 		System.out.println(JSON.toJSONBytes(complexSet).length);
 		System.out.println(KryoKit.writeToByteArray(complexSet).length);
 		System.out.println(JSON.parseArray(JSON.toJSONString(complexSet), Complex.class));
@@ -181,7 +184,7 @@ public class SerializeTest {
 		complexList4.add(getComplex());
 		complexList4.add(getComplex());
 		complexMap.put(IdKit.generateUUID(), complexList4);
-		System.out.println(serialize(complexMap).length);
+		System.out.println(jdkSerialize(complexMap).length);
 		System.out.println(JSON.toJSONBytes(complexMap).length);
 		System.out.println(KryoKit.writeToByteArray(complexMap).length);
 		System.out.println(JSON.parseObject(JSON.toJSONString(complexMap), Map.Entry.class));
@@ -194,11 +197,8 @@ public class SerializeTest {
 
 	}
 
-	/**
-	 * 序列化
-	 */
-	public static byte[] serialize(Object object) throws Exception {
-		try (ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
+	private static byte[] jdkSerialize(Object object) throws Exception {
+		try (ByteArrayOutputStream baos = new ByteArrayOutputStream(4096);
 		     ObjectOutputStream oos = new ObjectOutputStream(baos)
 		) {
 			oos.writeObject(object);
@@ -207,11 +207,8 @@ public class SerializeTest {
 		}
 	}
 
-	/**
-	 * 反序列化
-	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T deserialize(byte[] bytes, Class<T> clazz) throws Exception {
+	private static <T> T jdkDeserialize(byte[] bytes, Class<T> clazz) throws Exception {
 		T object = null;
 		try (ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bytes))) {
 			object = (T) ois.readObject();
@@ -220,6 +217,22 @@ public class SerializeTest {
 			// EOFException仅仅是流到达最末尾的标记,捕获该异常后,直接处理之前的数据就好了,无需处理该异常
 			return object;
 		}
+	}
+
+	private static byte[] jsonSerialize(Object object) {
+		return JSON.toJSONBytes(object);
+	}
+
+	private static <T> T jsonDeserialize(byte[] bytes, Class<T> clazz) {
+		return JSON.parseObject(bytes, clazz);
+	}
+
+	private static byte[] kryoSerialize(Object object) throws IOException {
+		return KryoKit.writeToByteArray(object);
+	}
+
+	private static <T> T kryoDeserialize(byte[] bytes) {
+		return KryoKit.readFromByteArray(bytes);
 	}
 
 	private static Base getBase() {
