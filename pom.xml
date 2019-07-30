@@ -7,69 +7,48 @@
 	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
-
-	<dependencyManagement>
-		<dependencies>
-			<!-- Lombok -->
-			<dependency>
-				<groupId>org.projectlombok</groupId>
-				<artifactId>lombok</artifactId>
-				<version>1.18.6</version>
-				<scope>provided</scope>
-			</dependency>
-			<!-- Spring Data Redis -->
-			<dependency>
-				<groupId>org.springframework.data</groupId>
-				<artifactId>spring-data-redis</artifactId>
-				<version>2.1.5.RELEASE</version>
-			</dependency>
-			<!-- jedis -->
-			<dependency>
-				<groupId>redis.clients</groupId>
-				<artifactId>jedis</artifactId>
-				<!--<version>2.9.0</version>-->
-				<version>3.0.1</version>
-			</dependency>
-			<!-- fastjson -->
-			<dependency>
-				<groupId>com.alibaba</groupId>
-				<artifactId>fastjson</artifactId>
-				<version>1.2.56</version>
-			</dependency>
-			<!-- kryo -->
-			<dependency>
-				<groupId>com.esotericsoftware</groupId>
-				<artifactId>kryo-shaded</artifactId>
-				<version>4.0.2</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-
 	<dependencies>
-		<!-- Lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+			<version>1.18.6</version>
+			<scope>provided</scope>
 		</dependency>
-		<!-- Spring Data Redis -->
+
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-redis</artifactId>
+			<version>2.1.9.RELEASE</version>
 		</dependency>
-		<!-- Jedis -->
 		<dependency>
 			<groupId>redis.clients</groupId>
 			<artifactId>jedis</artifactId>
+			<!--<version>2.9.3</version>-->
+			<version>3.1.0</version>
 		</dependency>
-		<!-- Fastjson -->
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>5.1.8.RELEASE</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
+			<version>1.2.56</version>
 		</dependency>
-		<!-- Kryo -->
 		<dependency>
 			<groupId>com.esotericsoftware</groupId>
 			<artifactId>kryo-shaded</artifactId>
+			<version>4.0.2</version>
 		</dependency>
 
 		<dependency>
