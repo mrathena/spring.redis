@@ -1,4 +1,4 @@
-package com.mrathena.redis;
+package com.mrathena.jedis;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;

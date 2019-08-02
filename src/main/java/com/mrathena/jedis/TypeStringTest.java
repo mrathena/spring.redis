@@ -1,7 +1,6 @@
-package com.mrathena.redis;
+package com.mrathena.jedis;
 
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.params.SetParams;
 
 /**
  * @author mrathena on 2019/3/29 15:54
@@ -25,16 +24,19 @@ public class TypeStringTest {
 		Jedis jedis = preTest();
 
 		// setnx,setex,psetex三个命令可能后面被移除,使用下面方式替代
+		// jedis 2.9.3
+		jedis.set("key", "value", "nx");
+		// jedis 3.1.0
 		// 存在才set
-		jedis.set("key", "value", SetParams.setParams().xx());
-		// 不存在才set
-		jedis.set("key", "value", SetParams.setParams().nx());
-		jedis.set("key", "value", SetParams.setParams().ex(1).nx());
-		jedis.set("key", "value", SetParams.setParams().px(1000).nx());
-		// set同时1秒过期
-		jedis.set("key", "value", SetParams.setParams().ex(1));
-		// set同时1000毫秒过期
-		jedis.set("key", "value", SetParams.setParams().px(1000));
+//		jedis.set("key", "value", SetParams.setParams().xx());
+//		// 不存在才set
+//		jedis.set("key", "value", SetParams.setParams().nx());
+//		jedis.set("key", "value", SetParams.setParams().ex(1).nx());
+//		jedis.set("key", "value", SetParams.setParams().px(1000).nx());
+//		// set同时1秒过期
+//		jedis.set("key", "value", SetParams.setParams().ex(1));
+//		// set同时1000毫秒过期
+//		jedis.set("key", "value", SetParams.setParams().px(1000));
 
 		jedis.set("key1", "value1");
 		jedis.set("key1", "value2");

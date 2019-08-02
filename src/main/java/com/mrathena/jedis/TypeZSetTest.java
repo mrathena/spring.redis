@@ -1,4 +1,4 @@
-package com.mrathena.redis;
+package com.mrathena.jedis;
 
 import redis.clients.jedis.Jedis;
 
