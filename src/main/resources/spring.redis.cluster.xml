@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxTotal" value="10"/>
+		<property name="maxIdle" value="10"/>
+		<property name="minIdle" value="1"/>
+		<!--从池中取出Jedis实例时是否校验可用,验证失败该实例被移除,并创建一个可用的新的实例,然后再被取出来-->
+		<property name="testOnBorrow" value="true"/>
+	</bean>
+
+	<bean id="redisStandaloneConfiguration" class="org.springframework.data.redis.connection.RedisStandaloneConfiguration">
+		<constructor-arg name="hostName" value="172.17.46.11"/>
+		<constructor-arg name="port" value="26380"/>
+	</bean>
+
+	<!--RedisConnectionFactory有两种SpringFramework实现类,JedisConnectionFactory/LettuceConnectionFactory-->
+	<bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+		<constructor-arg name="sentinelConfig" ref="redisSentinelConfiguration"/>
+		<constructor-arg name="poolConfig" ref="jedisPoolConfig"/>
+	</bean>
+
+	<!--RedisTemplate继承于RedisAccessor,需要配置一个RedisConnectionFactory-->
+	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+		<property name="connectionFactory" ref="jedisConnectionFactory"/>
+		<property name="defaultSerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+		</property>
+	</bean>
+
+	<bean id="stringRedisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">
+		<property name="connectionFactory" ref="jedisConnectionFactory"/>
+	</bean>
+
+</beans>

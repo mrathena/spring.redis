@@ -1,4 +1,4 @@
-package com.mrathena.redis.sentinel;
+package com.mrathena.redis;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,13 +12,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author mrathena on 2019/7/30 19:35
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath*:spring.redis.sentinel.xml")
-public class SentinelTest {
+@ContextConfiguration("classpath:spring.redis.cluster.xml")
+public class ClusterTest {
 
 	@Autowired
-	private StringRedisTemplate stringRedisTemplate;
-	@Autowired
 	private RedisTemplate<String, Object> redisTemplate;
+	@Autowired
+	private StringRedisTemplate stringRedisTemplate;
 
 	@Test
 	public void test() {
