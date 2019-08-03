@@ -1,5 +1,14 @@
 package com.mrathena.redis;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson.support.config.FastJsonConfig;
+import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,10 +41,10 @@ public class StandaloneTest {
 	private ValueOperations<String, Object> stringObjectValueOperations;
 	private ValueOperations<String, String> stringStringValueOperations;
 
-	private User user;
-	private List<User> userList;
-	private Set<User> userSet;
-	private Map<String, User> userMap;
+	private Data data;
+	private List<Data> dataList;
+	private Set<Data> dataSet;
+	private Map<String, Data> dataMap;
 
 	@Before
 	public void beforeSerialize() {
@@ -43,22 +52,24 @@ public class StandaloneTest {
 		stringObjectValueOperations = redisTemplate.opsForValue();
 		stringStringValueOperations = stringRedisTemplate.opsForValue();
 		// 数据
-		User user = new User(new Name("u", "n"), 20, true);
-		User user2 = new User(new Name("u2", "n2"), 22, true);
-		User user3 = new User(new Name("u3", "n3"), 23, false);
-		this.user = user;
-		List<User> userList = new LinkedList<>();
-		userList.add(user);
-		userList.add(user3);
-		this.userList = userList;
-		Set<User> userSet = new HashSet<>();
-		userSet.add(user2);
-		userSet.add(user3);
-		this.userSet = userSet;
-		Map<String, User> userMap = new HashMap<>(4);
-		userMap.put("我是谁", user);
-		userMap.put("我管你", user2);
-		this.userMap = userMap;
+		Data data = new Data("s", new O("u", "n"), null, (byte) 1, (short) 2, 3, 4L, 1.1F, 1.2D, 'a', true, (byte) 5, (short) 6, 7, 8L, 2.3F, 2.2D, 'B', true);
+		Data data2 =
+				new Data("s", new O("u2", "n2"), null, (byte) 2, (short) 3, 4, 5L, 2.2F, 3.3D, 'b', true, (byte) 6, (short) 7, 8, 9L, 4.4F, 5.5D, 'C', false);
+		Data data3 =
+				new Data("s", new O("u3", "n3"), null, (byte) 3, (short) 4, 5, 6L, 3.3F, 4.4D, 'c', true, (byte) 7, (short) 8, 9, 10L, 5.5F, 6.6D, 'D', false);
+		this.data = data;
+		List<Data> dataList = new LinkedList<>();
+		dataList.add(data);
+		dataList.add(data3);
+		this.dataList = dataList;
+		Set<Data> dataSet = new HashSet<>();
+		dataSet.add(data2);
+		dataSet.add(data3);
+		this.dataSet = dataSet;
+		Map<String, Data> dataMap = new HashMap<>(4);
+		dataMap.put("我是谁", data);
+		dataMap.put("我管你", data2);
+		this.dataMap = dataMap;
 	}
 
 	@Test
@@ -69,39 +80,33 @@ public class StandaloneTest {
 
 	@Test
 	public void JdkSerializationRedisSerializer() {
-		System.out.println("----------------------------------------------------------------------------------------------------");
 		redisTemplate.setValueSerializer(new JdkSerializationRedisSerializer());
-		stringObjectValueOperations.set(K, user);
+		stringObjectValueOperations.set(K, 123);
+//		stringObjectValueOperations.increment(K);
 		System.out.println(stringObjectValueOperations.get(K));
-		System.out.println(stringObjectValueOperations.get(K).getClass());
-		User dUser = (User) stringObjectValueOperations.get(K);
-		System.out.println(dUser);
 		System.out.println(stringStringValueOperations.get(K));
-		System.out.println();
-		stringObjectValueOperations.set(K, userList);
-		System.out.println(stringObjectValueOperations.get(K));
-		System.out.println(stringObjectValueOperations.get(K).getClass());
-		List<User> dUserList = (List<User>) stringObjectValueOperations.get(K);
-		System.out.println(dUserList);
-		System.out.println();
-		stringObjectValueOperations.set(K, userSet);
-		System.out.println(stringObjectValueOperations.get(K));
-		System.out.println(stringObjectValueOperations.get(K).getClass());
-		Set<User> dUserSet = (Set<User>) stringObjectValueOperations.get(K);
-		System.out.println(dUserSet);
-		System.out.println();
-		stringObjectValueOperations.set(K, userMap);
-		System.out.println(stringObjectValueOperations.get(K));
-		System.out.println(stringObjectValueOperations.get(K).getClass());
-		Map<String, User> dUserMap = (Map<String, User>) stringObjectValueOperations.get(K);
-		System.out.println(dUserMap);
 		System.out.println();
 		stringObjectValueOperations.set(K, "你好啊");
 		System.out.println(stringObjectValueOperations.get(K));
 		System.out.println(stringStringValueOperations.get(K));
+		stringObjectValueOperations.set(K, data);
+		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringStringValueOperations.get(K));
+		System.out.println();
+		stringObjectValueOperations.set(K, dataList);
+		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringStringValueOperations.get(K));
+		System.out.println();
+		stringObjectValueOperations.set(K, dataSet);
+		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringStringValueOperations.get(K));
+		System.out.println();
+		stringObjectValueOperations.set(K, dataMap);
+		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringStringValueOperations.get(K));
 		// org.springframework.data.redis.serializer.JdkSerializationRedisSerializer
-		// 强制需要实现序列化,直接看redis不太方便,据说占的空间会大一点 TODO 尝试看redis中能否获取size
-		// 用StringRedisTemplate取RedisTemplate存的序列化为非String的数据,也能取出来,但是乱七八糟的,还挺长
+		// 反序列化时不需要提供类型信息
+		// 强制需要实现序列化,直接看redis不太方便,据说占的空间会大一点,反序列化为String后,乱七八糟的,还挺长 TODO 尝试看redis中能否获取size
 		// 不支持自增自减操作
 	}
 
@@ -112,6 +117,7 @@ public class StandaloneTest {
 		stringObjectValueOperations.set(K, "你好啊");
 		System.out.println(stringObjectValueOperations.get(K));
 		System.out.println(stringStringValueOperations.get(K));
+		System.out.println();
 		stringStringValueOperations.set(K, "0.0,明显我不好啊!!!");
 		System.out.println(stringObjectValueOperations.get(K));
 		System.out.println(stringStringValueOperations.get(K));
@@ -119,19 +125,20 @@ public class StandaloneTest {
 		stringObjectValueOperations.set(K, "1");
 		stringObjectValueOperations.increment(K);
 		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringStringValueOperations.get(K));
 		// org.springframework.data.redis.serializer.StringRedisSerializer
+		// 支持自增自减操作
 		// 只支持String类型,用起来并不方便,需要手动把value转成string,不然set和get都会类转换异常
 		// RedisTemplate和StringRedisTemplate数据是互通的,想想也是通的,网上都是胡说八道
-		// 支持自增自减操作
 	}
 
 	@Test
 	public void GenericToStringSerializer() {
-		// GenericToStringSerializer<User> userGenericToStringSerializer = new GenericToStringSerializer<>(User.class);
-		// userGenericToStringSerializer.setTypeConverter(new TypeConverter(););
-		// 需要实现org.springframework.beans.TypeConverter类型的类型转换器,用于把User和String互相转换
-		// redisTemplate.setValueSerializer(userGenericToStringSerializer);
-		// stringObjectValueOperations.set(K, user);
+		// GenericToStringSerializer<Data> DataGenericToStringSerializer = new GenericToStringSerializer<>(Data.class);
+		// DataGenericToStringSerializer.setTypeConverter(new TypeConverter(););
+		// 需要实现org.springframework.beans.TypeConverter类型的类型转换器,用于把Data和String互相转换
+		// redisTemplate.setValueSerializer(DataGenericToStringSerializer);
+		// stringObjectValueOperations.set(K, data);
 		// System.out.println(stringObjectValueOperations.get(K));
 		// org.springframework.data.redis.serializer.GenericToStringSerializer
 		// GenericToStringSerializer,可自行实现普通类型和String的互相转换,一般几乎不会使用把
@@ -143,75 +150,153 @@ public class StandaloneTest {
 		stringObjectValueOperations.set(K, 123);
 		stringObjectValueOperations.increment(K);
 		System.out.println(stringObjectValueOperations.get(K));
-		System.out.println();
-		stringObjectValueOperations.set(K, user);
-		System.out.println(stringObjectValueOperations.get(K));
 		System.out.println(stringStringValueOperations.get(K));
-		System.out.println(stringObjectValueOperations.get(K).getClass());
-		User dUser = (User) stringObjectValueOperations.get(K);
-		System.out.println(dUser);
-		System.out.println();
-		stringObjectValueOperations.set(K, userList);
-		System.out.println(stringObjectValueOperations.get(K));
-		System.out.println(stringObjectValueOperations.get(K).getClass());
-		List<User> dUserList = (List<User>) stringObjectValueOperations.get(K);
-		System.out.println(dUserList);
-		System.out.println();
-		stringObjectValueOperations.set(K, userSet);
-		System.out.println(stringObjectValueOperations.get(K));
-		System.out.println(stringObjectValueOperations.get(K).getClass());
-		Set<User> dUserSet = (Set<User>) stringObjectValueOperations.get(K);
-		System.out.println(dUserSet);
-		System.out.println();
-		stringObjectValueOperations.set(K, userMap);
-		System.out.println(stringObjectValueOperations.get(K));
-		System.out.println(stringObjectValueOperations.get(K).getClass());
-		Map<String, User> dUserMap = (Map<String, User>) stringObjectValueOperations.get(K);
-		System.out.println(dUserMap);
 		System.out.println();
 		stringObjectValueOperations.set(K, "你好啊");
 		System.out.println(stringObjectValueOperations.get(K));
 		System.out.println(stringStringValueOperations.get(K));
-		System.out.println(stringObjectValueOperations.get(K).getClass());
-		String string = (String) stringObjectValueOperations.get(K);
-		System.out.println(string);
+		System.out.println();
+		stringObjectValueOperations.set(K, data);
+		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringStringValueOperations.get(K));
+		System.out.println();
+		stringObjectValueOperations.set(K, dataList);
+		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringStringValueOperations.get(K));
+		System.out.println();
+		stringObjectValueOperations.set(K, dataSet);
+		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringStringValueOperations.get(K));
+		System.out.println();
+		stringObjectValueOperations.set(K, dataMap);
+		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringStringValueOperations.get(K));
 		// org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 		// 支持自增自减操作
-		// 序列化为json,而且包含数据类型,取出来的直接就是对象,不需要自己反序列化,非常方便,强烈推荐
-		// {"@class":"com.mrathena.redis.User","name":{"@class":"com.mrathena.redis.Name","username":"u","nickname":"n"},"age":20,"sex":true}
+		// 序列化为json,而且包含数据类型,可直接强制转换类型,非常方便,强烈推荐
+		// {"@class":"com.mrathena.redis.Data","name":{"@class":"com.mrathena.redis.Name","Dataname":"u","nickname":"n"},"age":20,"sex":true}
 	}
 
 	@Test
 	public void Jackson2JsonRedisSerializer() {
-		redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
+		Jackson2JsonRedisSerializer<Object> objectJackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+		objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+		objectJackson2JsonRedisSerializer.setObjectMapper(objectMapper);
+		// 如果没有ObjectMapper,反序列化的时候会报错,LinkedHashMap不能转化成Data
+		redisTemplate.setValueSerializer(objectJackson2JsonRedisSerializer);
+		stringObjectValueOperations.set(K, 123);
+		stringObjectValueOperations.increment(K);
+		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringStringValueOperations.get(K));
+		System.out.println();
+		stringObjectValueOperations.set(K, "你好啊");
+		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringStringValueOperations.get(K));
+		System.out.println();
+		stringObjectValueOperations.set(K, data);
+		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringStringValueOperations.get(K));
+		System.out.println();
+		stringObjectValueOperations.set(K, dataList);
+		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringStringValueOperations.get(K));
+		System.out.println();
+		stringObjectValueOperations.set(K, dataSet);
+		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringStringValueOperations.get(K));
+		System.out.println();
+		stringObjectValueOperations.set(K, dataMap);
+		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringStringValueOperations.get(K));
+		// org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer
+		// 支持自增自减操作
+		// 序列化为json,但是感觉不太合理,包含数据类型,可直接强制转换类型,也算方便
+		// ["com.mrathena.redis.Data",{"name":["com.mrathena.redis.Name",{"Dataname":"u","nickname":"n"}],"age":20,"sex":true}]
+	}
+
+	@Test
+	public void FastJsonRedisSerializer() {
+		FastJsonRedisSerializer<Object> objectFastJsonRedisSerializer = new FastJsonRedisSerializer<>(Object.class);
+		FastJsonConfig fastJsonConfig = new FastJsonConfig();
+		fastJsonConfig.setDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+		fastJsonConfig.setSerializerFeatures(SerializerFeature.WriteMapNullValue, SerializerFeature.WriteClassName);
+		objectFastJsonRedisSerializer.setFastJsonConfig(fastJsonConfig);
+		// 如果没有SerializerFeature.WriteMapNullValue,序列化后的json中没有值为null的字段
+		redisTemplate.setValueSerializer(objectFastJsonRedisSerializer);
+		stringObjectValueOperations.set(K, 123);
+		stringObjectValueOperations.increment(K);
+		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringStringValueOperations.get(K));
+		System.out.println();
+		stringObjectValueOperations.set(K, "你好啊");
+		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringStringValueOperations.get(K));
+		System.out.println();
+		stringObjectValueOperations.set(K, data);
+		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringStringValueOperations.get(K));
+		System.out.println(((JSONObject) stringObjectValueOperations.get(K)).toJavaObject(Data.class));
+		System.out.println();
+		stringObjectValueOperations.set(K, dataList);
+		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringStringValueOperations.get(K));
+		Object o = ((JSONArray) stringObjectValueOperations.get(K)).toJavaObject(new TypeReference<List<Data>>() {});
+		System.out.println(o);
+		System.out.println();
+		stringObjectValueOperations.set(K, dataSet);
+		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringStringValueOperations.get(K));
+		o = ((JSONArray) stringObjectValueOperations.get(K)).toJavaObject(new TypeReference<Set<Data>>() {});
+		System.out.println(o);
+		System.out.println();
+		stringObjectValueOperations.set(K, dataMap);
+		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringStringValueOperations.get(K));
+		o = ((JSONObject) stringObjectValueOperations.get(K)).toJavaObject(new TypeReference<Map<String, Data>>() {});
+		System.out.println(o);
+		// com.alibaba.fastjson.support.spring.FastJsonRedisSerializer
+		// 支持自增自减操作
+		// 默认会去掉值为null的字段(这个可以设置)
+		// 反序列化后的类型为JsonObject和JsonArray不能直接到Java,json中不带类型信息,转换很不方便
+	}
+
+	@Test
+	public void KryoRedisSerializer() {
+		redisTemplate.setValueSerializer(null);
 		stringObjectValueOperations.set(K, 123);
 		stringObjectValueOperations.increment(K);
 		System.out.println(stringObjectValueOperations.get(K));
 		System.out.println();
-		stringObjectValueOperations.set(K, user);
+		stringObjectValueOperations.set(K, "你好啊");
+		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringStringValueOperations.get(K));
+		System.out.println();
+		stringObjectValueOperations.set(K, data);
 		System.out.println(stringObjectValueOperations.get(K));
 		System.out.println(stringStringValueOperations.get(K));
 		System.out.println(stringObjectValueOperations.get(K).getClass());
-		User dUser = (User) stringObjectValueOperations.get(K);
-		System.out.println(dUser);
+		Data dData = (Data) stringObjectValueOperations.get(K);
+		System.out.println(dData);
 		System.out.println();
-		stringObjectValueOperations.set(K, userList);
+		stringObjectValueOperations.set(K, dataList);
 		System.out.println(stringObjectValueOperations.get(K));
 		System.out.println(stringObjectValueOperations.get(K).getClass());
-		List<User> dUserList = (List<User>) stringObjectValueOperations.get(K);
-		System.out.println(dUserList);
+		List<Data> dDataList = (List<Data>) stringObjectValueOperations.get(K);
+		System.out.println(dDataList);
 		System.out.println();
-		stringObjectValueOperations.set(K, userSet);
+		stringObjectValueOperations.set(K, dataSet);
 		System.out.println(stringObjectValueOperations.get(K));
 		System.out.println(stringObjectValueOperations.get(K).getClass());
-		Set<User> dUserSet = (Set<User>) stringObjectValueOperations.get(K);
-		System.out.println(dUserSet);
+		Set<Data> dDataSet = (Set<Data>) stringObjectValueOperations.get(K);
+		System.out.println(dDataSet);
 		System.out.println();
-		stringObjectValueOperations.set(K, userMap);
+		stringObjectValueOperations.set(K, dataMap);
 		System.out.println(stringObjectValueOperations.get(K));
 		System.out.println(stringObjectValueOperations.get(K).getClass());
-		Map<String, User> dUserMap = (Map<String, User>) stringObjectValueOperations.get(K);
-		System.out.println(dUserMap);
+		Map<String, Data> dDataMap = (Map<String, Data>) stringObjectValueOperations.get(K);
+		System.out.println(dDataMap);
 		System.out.println();
 		stringObjectValueOperations.set(K, "你好啊");
 		System.out.println(stringObjectValueOperations.get(K));
@@ -219,20 +304,6 @@ public class StandaloneTest {
 		System.out.println(stringObjectValueOperations.get(K).getClass());
 		String string = (String) stringObjectValueOperations.get(K);
 		System.out.println(string);
-	}
-
-	@Test
-	public void 测试两者数据是否通用() {
-		// 是通用的,默认都是0号数据库
-		stringStringValueOperations.set(K, "test");
-		System.out.println(stringObjectValueOperations.get(K));
-		stringObjectValueOperations.set(K, "test");
-		System.out.println(stringStringValueOperations.get(K));
-	}
-
-	@Test
-	public void 测试序列化() {
-
 	}
 
 }
