@@ -1,14 +1,14 @@
 package com.mrathena.redis;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.parser.ParserConfig;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mrathena.spring.redis.serializer.CustomFastJsonRedisSerializer;
+import com.mrathena.spring.redis.serializer.CustomKryoRedisSerializer;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -150,26 +150,32 @@ public class StandaloneTest {
 		stringObjectValueOperations.set(K, 123);
 		stringObjectValueOperations.increment(K);
 		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringObjectValueOperations.get(K).getClass());
 		System.out.println(stringStringValueOperations.get(K));
 		System.out.println();
 		stringObjectValueOperations.set(K, "你好啊");
 		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringObjectValueOperations.get(K).getClass());
 		System.out.println(stringStringValueOperations.get(K));
 		System.out.println();
 		stringObjectValueOperations.set(K, data);
 		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringObjectValueOperations.get(K).getClass());
 		System.out.println(stringStringValueOperations.get(K));
 		System.out.println();
 		stringObjectValueOperations.set(K, dataList);
 		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringObjectValueOperations.get(K).getClass());
 		System.out.println(stringStringValueOperations.get(K));
 		System.out.println();
 		stringObjectValueOperations.set(K, dataSet);
 		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringObjectValueOperations.get(K).getClass());
 		System.out.println(stringStringValueOperations.get(K));
 		System.out.println();
 		stringObjectValueOperations.set(K, dataMap);
 		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringObjectValueOperations.get(K).getClass());
 		System.out.println(stringStringValueOperations.get(K));
 		// org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 		// 支持自增自减操作
@@ -189,26 +195,32 @@ public class StandaloneTest {
 		stringObjectValueOperations.set(K, 123);
 		stringObjectValueOperations.increment(K);
 		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringObjectValueOperations.get(K).getClass());
 		System.out.println(stringStringValueOperations.get(K));
 		System.out.println();
 		stringObjectValueOperations.set(K, "你好啊");
 		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringObjectValueOperations.get(K).getClass());
 		System.out.println(stringStringValueOperations.get(K));
 		System.out.println();
 		stringObjectValueOperations.set(K, data);
 		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringObjectValueOperations.get(K).getClass());
 		System.out.println(stringStringValueOperations.get(K));
 		System.out.println();
 		stringObjectValueOperations.set(K, dataList);
 		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringObjectValueOperations.get(K).getClass());
 		System.out.println(stringStringValueOperations.get(K));
 		System.out.println();
 		stringObjectValueOperations.set(K, dataSet);
 		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringObjectValueOperations.get(K).getClass());
 		System.out.println(stringStringValueOperations.get(K));
 		System.out.println();
 		stringObjectValueOperations.set(K, dataMap);
 		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringObjectValueOperations.get(K).getClass());
 		System.out.println(stringStringValueOperations.get(K));
 		// org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer
 		// 支持自增自减操作
@@ -219,6 +231,8 @@ public class StandaloneTest {
 	@Test
 	public void FastJsonRedisSerializer() {
 		FastJsonRedisSerializer<Object> objectFastJsonRedisSerializer = new FastJsonRedisSerializer<>(Object.class);
+		ParserConfig.getGlobalInstance().setAutoTypeSupport(true);
+		// 开启FastJson的AutoType,可以给Json中写入class信息
 		FastJsonConfig fastJsonConfig = new FastJsonConfig();
 		fastJsonConfig.setDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 		fastJsonConfig.setSerializerFeatures(SerializerFeature.WriteMapNullValue, SerializerFeature.WriteClassName);
@@ -228,82 +242,117 @@ public class StandaloneTest {
 		stringObjectValueOperations.set(K, 123);
 		stringObjectValueOperations.increment(K);
 		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringObjectValueOperations.get(K).getClass());
 		System.out.println(stringStringValueOperations.get(K));
 		System.out.println();
 		stringObjectValueOperations.set(K, "你好啊");
 		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringObjectValueOperations.get(K).getClass());
 		System.out.println(stringStringValueOperations.get(K));
 		System.out.println();
 		stringObjectValueOperations.set(K, data);
 		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringObjectValueOperations.get(K).getClass());
 		System.out.println(stringStringValueOperations.get(K));
-		System.out.println(((JSONObject) stringObjectValueOperations.get(K)).toJavaObject(Data.class));
 		System.out.println();
 		stringObjectValueOperations.set(K, dataList);
 		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringObjectValueOperations.get(K).getClass());
 		System.out.println(stringStringValueOperations.get(K));
-		Object o = ((JSONArray) stringObjectValueOperations.get(K)).toJavaObject(new TypeReference<List<Data>>() {});
-		System.out.println(o);
 		System.out.println();
 		stringObjectValueOperations.set(K, dataSet);
 		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringObjectValueOperations.get(K).getClass());
 		System.out.println(stringStringValueOperations.get(K));
-		o = ((JSONArray) stringObjectValueOperations.get(K)).toJavaObject(new TypeReference<Set<Data>>() {});
-		System.out.println(o);
 		System.out.println();
 		stringObjectValueOperations.set(K, dataMap);
 		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringObjectValueOperations.get(K).getClass());
 		System.out.println(stringStringValueOperations.get(K));
-		o = ((JSONObject) stringObjectValueOperations.get(K)).toJavaObject(new TypeReference<Map<String, Data>>() {});
-		System.out.println(o);
 		// com.alibaba.fastjson.support.spring.FastJsonRedisSerializer
 		// 支持自增自减操作
-		// 默认会去掉值为null的字段(这个可以设置)
-		// 反序列化后的类型为JsonObject和JsonArray不能直接到Java,json中不带类型信息,转换很不方便
+		// 默认会去掉值为null的字段(可以设置支持),默认不支持AutoType(可以设置支持)
+		// 默认反序列化后的类型为JsonObject和JsonArray,不能直接到JavaBean(开启AutoType后可以)
+		// 序列化结果不是标准JSON
 	}
 
 	@Test
-	public void KryoRedisSerializer() {
-		redisTemplate.setValueSerializer(null);
+	public void CustomerFastJsonRedisSerializer() {
+		redisTemplate.setValueSerializer(new CustomFastJsonRedisSerializer<>(Object.class));
 		stringObjectValueOperations.set(K, 123);
 		stringObjectValueOperations.increment(K);
 		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringObjectValueOperations.get(K).getClass());
+		System.out.println(stringStringValueOperations.get(K));
 		System.out.println();
 		stringObjectValueOperations.set(K, "你好啊");
 		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringObjectValueOperations.get(K).getClass());
 		System.out.println(stringStringValueOperations.get(K));
 		System.out.println();
 		stringObjectValueOperations.set(K, data);
 		System.out.println(stringObjectValueOperations.get(K));
-		System.out.println(stringStringValueOperations.get(K));
 		System.out.println(stringObjectValueOperations.get(K).getClass());
-		Data dData = (Data) stringObjectValueOperations.get(K);
-		System.out.println(dData);
+		System.out.println(stringStringValueOperations.get(K));
 		System.out.println();
 		stringObjectValueOperations.set(K, dataList);
 		System.out.println(stringObjectValueOperations.get(K));
 		System.out.println(stringObjectValueOperations.get(K).getClass());
+		System.out.println(stringStringValueOperations.get(K));
 		List<Data> dDataList = (List<Data>) stringObjectValueOperations.get(K);
 		System.out.println(dDataList);
 		System.out.println();
 		stringObjectValueOperations.set(K, dataSet);
 		System.out.println(stringObjectValueOperations.get(K));
 		System.out.println(stringObjectValueOperations.get(K).getClass());
-		Set<Data> dDataSet = (Set<Data>) stringObjectValueOperations.get(K);
-		System.out.println(dDataSet);
+		System.out.println(stringStringValueOperations.get(K));
 		System.out.println();
 		stringObjectValueOperations.set(K, dataMap);
 		System.out.println(stringObjectValueOperations.get(K));
 		System.out.println(stringObjectValueOperations.get(K).getClass());
-		Map<String, Data> dDataMap = (Map<String, Data>) stringObjectValueOperations.get(K);
-		System.out.println(dDataMap);
-		System.out.println();
+		System.out.println(stringStringValueOperations.get(K));
+		// com.mrathena.spring.redis.serializer.CustomFastJsonRedisSerializer
+		// 支持自增自减操作
+		// 默认会去掉值为null的字段(可以设置支持),默认不支持AutoType(可以设置支持)
+		// 默认反序列化后的类型为JsonObject和JsonArray,不能直接到JavaBean(开启AutoType后可以)
+		// // 序列化结果不是标准JSON
+	}
+
+	@Test
+	public void KryoRedisSerializer() {
+		//
+	}
+
+	@Test
+	public void CustomKryoRedisSerializer() {
+		redisTemplate.setValueSerializer(new CustomKryoRedisSerializer<>(Object.class));
 		stringObjectValueOperations.set(K, "你好啊");
 		System.out.println(stringObjectValueOperations.get(K));
-		System.out.println(stringStringValueOperations.get(K));
 		System.out.println(stringObjectValueOperations.get(K).getClass());
-		String string = (String) stringObjectValueOperations.get(K);
-		System.out.println(string);
+		System.out.println(stringStringValueOperations.get(K));
+		System.out.println();
+		stringObjectValueOperations.set(K, data);
+		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringObjectValueOperations.get(K).getClass());
+		System.out.println(stringStringValueOperations.get(K));
+		System.out.println();
+		stringObjectValueOperations.set(K, dataList);
+		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringObjectValueOperations.get(K).getClass());
+		System.out.println(stringStringValueOperations.get(K));
+		System.out.println();
+		stringObjectValueOperations.set(K, dataSet);
+		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringObjectValueOperations.get(K).getClass());
+		System.out.println(stringStringValueOperations.get(K));
+		System.out.println();
+		stringObjectValueOperations.set(K, dataMap);
+		System.out.println(stringObjectValueOperations.get(K));
+		System.out.println(stringObjectValueOperations.get(K).getClass());
+		System.out.println(stringStringValueOperations.get(K));
+		// com.mrathena.spring.redis.serializer.CustomKryoRedisSerializer
+		// 不支持自增自减操作
+		// 序列化后不便查看,但据说占用空间很小
 	}
 
 }

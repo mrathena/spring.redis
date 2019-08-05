@@ -1,6 +1,7 @@
 package com.mrathena.spring.redis.serializer;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.parser.ParserConfig;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.SerializationException;
@@ -10,13 +11,18 @@ import java.nio.charset.Charset;
 /**
  * @author mrathena on 2019/8/3 18:06
  */
-public class FastJsonRedisSerializer<T> implements RedisSerializer<T> {
+public class CustomFastJsonRedisSerializer<T> implements RedisSerializer<T> {
 
 	public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
 	private Class<T> clazz;
 
-	public FastJsonRedisSerializer(Class<T> clazz) {
+	static {
+		ParserConfig.getGlobalInstance().setAutoTypeSupport(true);
+		// 开启FastJson的AutoType,可以给Json中写入class信息
+	}
+
+	public CustomFastJsonRedisSerializer(Class<T> clazz) {
 		super();
 		this.clazz = clazz;
 	}
@@ -26,7 +32,7 @@ public class FastJsonRedisSerializer<T> implements RedisSerializer<T> {
 		if (t == null) {
 			return new byte[0];
 		}
-		return JSON.toJSONString(t, SerializerFeature.WriteClassName).getBytes(DEFAULT_CHARSET);
+		return JSON.toJSONString(t, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteClassName).getBytes(DEFAULT_CHARSET);
 	}
 
 	@Override

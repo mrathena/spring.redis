@@ -13,8 +13,8 @@ import java.io.ByteArrayOutputStream;
 /**
  * @author mrathena on 2019/8/3 18:06
  */
-public class KryoRedisSerializer<T> implements RedisSerializer<T> {
-	Logger logger = LoggerFactory.getLogger(KryoRedisSerializer.class);
+public class CustomKryoRedisSerializer<T> implements RedisSerializer<T> {
+	Logger logger = LoggerFactory.getLogger(CustomKryoRedisSerializer.class);
 
 	public static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
 
@@ -22,7 +22,7 @@ public class KryoRedisSerializer<T> implements RedisSerializer<T> {
 
 	private Class<T> clazz;
 
-	public KryoRedisSerializer(Class<T> clazz) {
+	public CustomKryoRedisSerializer(Class<T> clazz) {
 		super();
 		this.clazz = clazz;
 	}
