@@ -29,7 +29,7 @@ import java.util.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:spring.redis.standalone.xml")
-public class StandaloneTest {
+public class RedisStandaloneTest {
 
 	private static final String K = "MRATHENA:SPRING.REDIS:TEST";
 

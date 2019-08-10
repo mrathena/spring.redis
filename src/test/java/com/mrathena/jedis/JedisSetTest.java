@@ -1,16 +1,25 @@
 package com.mrathena.jedis;
 
+import org.junit.Before;
+import org.junit.Test;
 import redis.clients.jedis.Jedis;
 
 /**
- * @author mrathena on 2019/3/29 17:53
+ * @author mrathena on 2019-08-11 01:22
  */
-public class TypeSetTest {
+public class JedisSetTest {
 
-	public static Jedis preTest() {
-		Jedis jedis = new Jedis(Common.HOST, Common.PORT);
+	private Jedis jedis;
+
+	@Before
+	public void before() {
+		this.jedis = new Jedis(Common.HOST, Common.PORT);
 		jedis.connect();
+		jedis.auth(Common.PASSWORD);
+	}
 
+	@Test
+	public void test() throws Exception {
 		jedis.sadd("test", "3");
 		jedis.sadd("test", "1");
 		jedis.sadd("test", "2");
@@ -20,13 +29,6 @@ public class TypeSetTest {
 		jedis.sadd("test", "5");
 
 		Common.print(jedis);
-
-		return jedis;
-	}
-
-	public static void main(String[] args) throws Exception {
-
-		Jedis jedis = preTest();
 
 		System.out.println(jedis.sismember("test", "1"));
 		System.out.println(jedis.sismember("test", "7"));
@@ -42,7 +44,6 @@ public class TypeSetTest {
 		Common.print(jedis);
 
 		jedis.disconnect();
-
 	}
 
 }

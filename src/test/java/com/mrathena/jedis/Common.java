@@ -5,12 +5,13 @@ import redis.clients.jedis.Jedis;
 import java.util.Set;
 
 /**
- * @author mrathena on 2019/3/29 15:51
+ * @author mrathena on 2019-08-11 01:19
  */
 public class Common {
 
-	public static final String HOST = "192.168.1.5";
+	public static final String HOST = "116.62.162.47";
 	public static final int PORT = 6379;
+	public static final String PASSWORD = "Hhsrv587..";
 
 	/**
 	 * //列出所有的key
@@ -44,6 +45,9 @@ public class Common {
 					System.out.println(type);
 			}
 		});
+		if (keys.size() == 0) {
+			System.out.println("empty");
+		}
 		System.out.println();
 	}
 

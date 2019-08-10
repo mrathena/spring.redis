@@ -13,7 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:spring.redis.cluster.xml")
-public class ClusterTest {
+public class RedisClusterTest {
 
 	@Autowired
 	private RedisTemplate<String, Object> redisTemplate;

@@ -1,5 +1,7 @@
 package com.mrathena.jedis;
 
+import org.junit.Before;
+import org.junit.Test;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.ScanResult;
 
@@ -7,14 +9,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author mrathena on 2019/3/29 17:53
+ * @author mrathena on 2019-08-11 01:22
  */
-public class TypeHashTest {
+public class JedisHashTest {
 
-	public static Jedis preTest() {
-		Jedis jedis = new Jedis(Common.HOST, Common.PORT);
+	private Jedis jedis;
+
+	@Before
+	public void before() {
+		this.jedis = new Jedis(Common.HOST, Common.PORT);
 		jedis.connect();
+		jedis.auth(Common.PASSWORD);
+	}
 
+	@Test
+	public void test() throws Exception {
 		jedis.hset("test", "username", "胡诗瑞");
 		jedis.hset("test", "password", "nicai");
 		jedis.hset("test", "nickname", "mrathena");
@@ -28,13 +37,6 @@ public class TypeHashTest {
 		jedis.hmset("test", map);
 
 		Common.print(jedis);
-
-		return jedis;
-	}
-
-	public static void main(String[] args) throws Exception {
-
-		Jedis jedis = preTest();
 
 		System.out.println(jedis.hget("test", "nickname"));
 		Common.print(jedis);
@@ -63,7 +65,6 @@ public class TypeHashTest {
 		Common.print(jedis);
 
 		jedis.disconnect();
-
 	}
 
 }
