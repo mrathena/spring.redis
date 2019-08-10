@@ -164,5 +164,9 @@ public class JedisListTest {
 		System.out.println(jedis.lrange("key", 0, -1));
 	}
 
+	@Test
+	public void rpoplpush() {
+		System.out.println("懒得看了,这个命令的解释太长了");
+	}
 
 }
