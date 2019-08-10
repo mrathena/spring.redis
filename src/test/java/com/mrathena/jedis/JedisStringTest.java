@@ -16,11 +16,7 @@ public class JedisStringTest {
 
 	@Before
 	public void before() {
-		this.jedis = new Jedis(Common.HOST, Common.PORT);
-		jedis.connect();
-		jedis.auth(Common.PASSWORD);
-		// 使用DB15号库来测试,不影响DB0的数据
-		jedis.select(Common.DATABASE);
+		this.jedis = Common.getJedis();
 	}
 
 	@After
@@ -38,7 +34,6 @@ public class JedisStringTest {
 
 	@Test
 	public void set() {
-		jedis.flushDB();
 		jedis.set("key1", "value1");
 		jedis.set("key1", "value2");
 		jedis.set("key2", "value2");
@@ -48,7 +43,6 @@ public class JedisStringTest {
 	@Test
 	public void setnx() {
 		// NX -- Only set the key if it does not already exist.
-		jedis.flushDB();
 		System.out.println(jedis.setnx("key", "value"));
 		Common.print(jedis);
 		System.out.println(jedis.setnx("key", "value2"));
@@ -60,7 +54,6 @@ public class JedisStringTest {
 		// jedis 2.9.3
 		// NX -- Only set the key if it does not already exist.
 		// XX -- Only set the key if it already exist.
-		jedis.flushDB();
 		jedis.set("key", "value", "nx");
 		Common.print(jedis);
 		jedis.set("key", "value2", "nx");
@@ -72,7 +65,6 @@ public class JedisStringTest {
 		// jedis 2.9.3
 		// NX -- Only set the key if it does not already exist.
 		// XX -- Only set the key if it already exist.
-		jedis.flushDB();
 		jedis.set("key", "value", "xx");
 		Common.print(jedis);
 		jedis.set("key", "value");
@@ -84,7 +76,6 @@ public class JedisStringTest {
 	@Test
 	public void setex() throws Exception {
 		// EX seconds -- Set the specified expire time, in seconds.
-		jedis.flushDB();
 		jedis.setex("key", 1, "value");
 		Common.print(jedis);
 		Thread.sleep(500);
@@ -96,7 +87,6 @@ public class JedisStringTest {
 	@Test
 	public void psetex() throws Exception {
 		// PX milliseconds -- Set the specified expire time, in milliseconds.
-		jedis.flushDB();
 		jedis.psetex("key", 1000L, "value");
 		Common.print(jedis);
 		Thread.sleep(500);
@@ -112,7 +102,6 @@ public class JedisStringTest {
 		// XX -- Only set the key if it already exist.
 		// EX seconds -- Set the specified expire time, in seconds.
 		// PX milliseconds -- Set the specified expire time, in milliseconds.
-		jedis.flushDB();
 		jedis.set("key", "value");
 		Common.print(jedis);
 		jedis.set("key", "value2", "nx", "ex", 1L);
@@ -134,7 +123,6 @@ public class JedisStringTest {
 		// XX -- Only set the key if it already exist.
 		// EX seconds -- Set the specified expire time, in seconds.
 		// PX milliseconds -- Set the specified expire time, in milliseconds.
-		jedis.flushDB();
 		jedis.set("key", "value");
 		Common.print(jedis);
 		jedis.set("key", "value2", "nx", "px", 1000L);
@@ -156,7 +144,6 @@ public class JedisStringTest {
 		// XX -- Only set the key if it already exist.
 		// EX seconds -- Set the specified expire time, in seconds.
 		// PX milliseconds -- Set the specified expire time, in milliseconds.
-		jedis.flushDB();
 		jedis.set("key", "value", "xx", "ex", 1);
 		Common.print(jedis);
 		jedis.set("key", "value");
@@ -176,7 +163,6 @@ public class JedisStringTest {
 		// XX -- Only set the key if it already exist.
 		// EX seconds -- Set the specified expire time, in seconds.
 		// PX milliseconds -- Set the specified expire time, in milliseconds.
-		jedis.flushDB();
 		jedis.set("key", "value", "xx", "px", 1000);
 		Common.print(jedis);
 		jedis.set("key", "value");
@@ -201,7 +187,6 @@ public class JedisStringTest {
 
 	@Test
 	public void incr() {
-		jedis.flushDB();
 		jedis.incr("key");
 		Common.print(jedis);
 		jedis.incrBy("key", 10);

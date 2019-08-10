@@ -13,9 +13,7 @@ public class JedisSetTest {
 
 	@Before
 	public void before() {
-		this.jedis = new Jedis(Common.HOST, Common.PORT);
-		jedis.connect();
-		jedis.auth(Common.PASSWORD);
+		this.jedis = Common.getJedis();
 	}
 
 	@Test

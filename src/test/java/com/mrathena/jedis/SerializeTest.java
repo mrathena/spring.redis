@@ -21,8 +21,7 @@ public class SerializeTest {
 
 	public static void main(String[] args) throws Exception {
 
-		Jedis jedis = new Jedis(Common.HOST, Common.PORT);
-		jedis.connect();
+		Jedis jedis = Common.getJedis();
 
 		// ----------------------------------------------------------------
 		// 序列化测试
