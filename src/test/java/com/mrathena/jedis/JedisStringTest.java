@@ -20,7 +20,7 @@ public class JedisStringTest {
 		jedis.connect();
 		jedis.auth(Common.PASSWORD);
 		// 使用DB15号库来测试,不影响DB0的数据
-		jedis.select(15);
+		jedis.select(Common.DATABASE);
 	}
 
 	@After

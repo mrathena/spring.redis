@@ -12,6 +12,7 @@ public class Common {
 	public static final String HOST = "116.62.162.47";
 	public static final int PORT = 6379;
 	public static final String PASSWORD = "Hhsrv587..";
+	public static final int DATABASE = 15;
 
 	/**
 	 * //列出所有的key
