@@ -41,6 +41,12 @@ public class JedisStringTest {
 	}
 
 	@Test
+	public void get() {
+		jedis.set("key", "value");
+		System.out.println(jedis.get("key"));
+	}
+
+	@Test
 	public void setnx() {
 		// NX -- Only set the key if it does not already exist.
 		System.out.println(jedis.setnx("key", "value"));
@@ -176,16 +182,6 @@ public class JedisStringTest {
 	}
 
 	@Test
-	public void del() {
-		set();
-		jedis.del("key1");
-		Common.print(jedis);
-		set();
-		jedis.del("key1", "key2");
-		Common.print(jedis);
-	}
-
-	@Test
 	public void incr() {
 		jedis.incr("key");
 		Common.print(jedis);
@@ -203,52 +199,8 @@ public class JedisStringTest {
 	}
 
 	@Test
-	public void type() {
-		// none(key不存在),string(字符串),list(列表),set(集合),zset(有序集),hash(哈希表)
-		incr();
-		Common.print(jedis);
-		System.out.println(jedis.type("key"));
-		System.out.println(jedis.type("unknown"));
-	}
-
-	@Test
-	public void flushDB() {
-		// 刷新当前DB
-		jedis.select(14);
-		jedis.set("key", "value");
-		Common.print(jedis);
-		jedis.select(15);
-		jedis.set("key", "value");
-		Common.print(jedis);
-		jedis.flushDB();
-		jedis.select(14);
-		Common.print(jedis);
-		jedis.select(15);
-		Common.print(jedis);
-	}
-
-	@Test
-	public void flushAll() {
-		// 刷新所有DB,谨慎操作
-		jedis.select(14);
-		jedis.set("key", "value");
-		Common.print(jedis);
-		jedis.select(15);
-		jedis.set("key", "value");
-		Common.print(jedis);
-//		jedis.flushAll();
-		jedis.select(14);
-		Common.print(jedis);
-		jedis.select(15);
-		Common.print(jedis);
-	}
-
-	@Test
 	public void notice() {
 		System.out.println();
-		System.out.println("----------");
-		System.out.println("jedis.flushDB(); 是刷新当前库, 当前库所有key都会被清空");
-		System.out.println("jedis.flushALL(); 是刷新所有库, 所有库所有key都会被清空, 需谨慎使用");
 		System.out.println("----------");
 		System.out.println("setnx,setex,psetex 三个命令可能后面被移除,使用下面方式替代");
 		System.out.println("jedis 2.9.3");

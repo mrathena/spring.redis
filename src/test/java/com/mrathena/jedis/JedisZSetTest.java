@@ -1,5 +1,6 @@
 package com.mrathena.jedis;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import redis.clients.jedis.Jedis;
@@ -14,6 +15,12 @@ public class JedisZSetTest {
 	@Before
 	public void before() {
 		this.jedis = Common.getJedis();
+	}
+
+	@After
+	public void after() {
+		jedis.flushDB();
+		jedis.disconnect();
 	}
 
 	@Test
