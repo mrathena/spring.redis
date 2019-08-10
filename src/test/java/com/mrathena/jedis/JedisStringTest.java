@@ -183,10 +183,13 @@ public class JedisStringTest {
 
 	@Test
 	public void incr() {
-		jedis.incr("key");
-		Common.print(jedis);
-		jedis.incrBy("key", 10);
-		Common.print(jedis);
+		// 可正可负,integer可以转double,反之报错,除非double的小数部分是0
+		System.out.println(jedis.incr("key"));
+		System.out.println(jedis.incrBy("key", 3));
+		System.out.println(jedis.incrBy("key", -2));
+		System.out.println(jedis.incrByFloat("key", 2.2D));
+		System.out.println(jedis.incrByFloat("key", -0.2D));
+		System.out.println(jedis.incrBy("key", 1));
 	}
 
 	@Test

@@ -46,7 +46,7 @@ public class Common {
 					System.out.println("Size:" + jedis.scard(item) + ",Value:" + jedis.smembers(item));
 					break;
 				case "zset":
-					System.out.println("Size:" + jedis.zcard(item) + ",Value:" + jedis.zrange(item, 0, 100));
+					System.out.println("Size:" + jedis.zcard(item) + ",Value:" + jedis.zrange(item, 0, -1));
 					break;
 				case "hash":
 					System.out.println("Size:" + jedis.hlen(item) + ",Value:" + jedis.hgetAll(item));

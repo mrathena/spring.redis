@@ -69,7 +69,7 @@ public class JedisListTest {
 	}
 
 	@Test
-	public void index() {
+	public void lindex() {
 		// 0到正无穷:从左往右,-1到负无穷:从右往左
 		jedis.rpush("key", "1");
 		jedis.rpush("key", "2");
@@ -90,7 +90,7 @@ public class JedisListTest {
 	}
 
 	@Test
-	public void set() {
+	public void lset() {
 		// 替换
 		jedis.rpush("key", "1");
 		jedis.rpush("key", "2");
@@ -103,7 +103,7 @@ public class JedisListTest {
 	}
 
 	@Test
-	public void insert() {
+	public void linsert() {
 		// 在key的元素[1]后面添加元素[666]
 		push();
 		System.out.println(jedis.linsert("key", BinaryClient.LIST_POSITION.AFTER, "1", "666"));
@@ -115,7 +115,7 @@ public class JedisListTest {
 	}
 
 	@Test
-	public void trim() {
+	public void ltrim() {
 		// ltrim key start stop
 		// 移除list中除给定index范围内的元素,不会移除start和stop坐标的元素
 		// 正数:从左往右数,0开始
@@ -131,7 +131,7 @@ public class JedisListTest {
 	}
 
 	@Test
-	public void rem() {
+	public void lrem() {
 		// lrem key n value
 		// n:正数:移除list中前n次出现的value元素
 		// n:负数:移除list中后n此数显的value元素
@@ -148,7 +148,7 @@ public class JedisListTest {
 	}
 
 	@Test
-	public void len() {
+	public void llen() {
 		push();
 		System.out.println(jedis.llen("key"));
 		jedis.lpop("key");
@@ -157,7 +157,7 @@ public class JedisListTest {
 	}
 
 	@Test
-	public void range() {
+	public void lrange() {
 		push();
 		System.out.println(jedis.lrange("key", 1, 3));
 		Common.print(jedis);
