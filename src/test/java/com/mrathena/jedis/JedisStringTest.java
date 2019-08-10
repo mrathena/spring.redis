@@ -262,6 +262,9 @@ public class JedisStringTest {
 	public void notice() {
 		System.out.println();
 		System.out.println("----------");
+		System.out.println("jedis.flushDB(); 是刷新当前库, 当前库所有key都会被清空");
+		System.out.println("jedis.flushALL(); 是刷新所有库, 所有库所有key都会被清空, 需谨慎使用");
+		System.out.println("----------");
 		System.out.println("setnx,setex,psetex 三个命令可能后面被移除,使用下面方式替代");
 		System.out.println("jedis 2.9.3");
 		System.out.println("jedis.set(\"key\", \"value\", \"nx\");");
