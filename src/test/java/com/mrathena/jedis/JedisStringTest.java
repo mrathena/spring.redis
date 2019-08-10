@@ -260,6 +260,7 @@ public class JedisStringTest {
 
 	@Test
 	public void notice() {
+		System.out.println();
 		System.out.println("----------");
 		System.out.println("setnx,setex,psetex 三个命令可能后面被移除,使用下面方式替代");
 		System.out.println("jedis 2.9.3");
