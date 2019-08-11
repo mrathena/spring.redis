@@ -6,12 +6,17 @@ import org.junit.Test;
 import redis.clients.jedis.BinaryClient;
 import redis.clients.jedis.Jedis;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * @author mrathena on 2019-08-11 01:22
  */
 public class JedisListTest {
 
 	private Jedis jedis;
+
+	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 	@Before
 	public void before() {
@@ -228,7 +233,51 @@ public class JedisListTest {
 		// 执行 RPOPLPUSH 得到的结果是 source 保存着列表 a,b ，而 destination 保存着列表 c,x,y,z。
 		// 如果 source 不存在，那么会返回 nil 值，并且不会执行任何操作。
 		// 如果 source 和 destination 是同样的，那么这个操作等同于移除列表最后一个元素并且把该元素放在列表头部， 所以这个命令也可以当作是一个旋转列表的命令。
+		System.out.println(jedis.rpush("key", "a", "b", "c", "d"));
+		System.out.println(jedis.rpush("key2", "e", "f"));
+		System.out.println(jedis.rpoplpush("key", "key2"));
+		Common.print(jedis);
+	}
 
+	@Test
+	public void bpop() {
+		// BLPOP key [key ...] timeout
+		// BLPOP 是阻塞式列表的弹出原语。 它是命令 LPOP 的阻塞版本，这是因为当给定列表内没有任何元素可供弹出的时候， 连接将被 BLPOP 命令阻塞。
+		// 当给定多个 key 参数时，按参数 key 的先后顺序依次检查各个列表，弹出第一个非空列表的头元素。
+		// 当存在多个给定 key 时， BLPOP 按给定 key 参数排列的先后顺序，依次检查各个列表。
+		// 我们假设 key list1 不存在，而 list2 和 list3 都是非空列表。考虑以下的命令：
+		// BLPOP list1 list2 list3 0
+		// BLPOP 保证返回一个存在于 list2 里的元素（因为它是从 list1 –> list2 –> list3 这个顺序查起的第一个非空列表）。
+		// 如果所有给定 key 都不存在或包含空列表，那么 BLPOP 命令将阻塞连接， 直到有另一个客户端对给定的这些 key 的任意一个执行 LPUSH 或 RPUSH 命令为止。
+		// 一旦有新的数据出现在其中一个列表里，那么这个命令会解除阻塞状态，并且返回 key 和弹出的元素值。
+		// 当 BLPOP 命令引起客户端阻塞并且设置了一个非零的超时参数 timeout 的时候，
+		// 若经过了指定的 timeout 仍没有出现一个针对某一特定 key 的 push 操作，则客户端会解除阻塞状态并且返回一个 nil 的多组合值(multi-bulk value)。
+		// timeout(秒)参数表示的是一个指定阻塞的最大秒数的整型值。当 timeout 为 0 是表示阻塞时间无限制。
+		// BRPOP key [key ...] timeout
+		// BRPOPLPUSH source destination timeout
+		System.out.println(jedis.rpush("key", "a"));
+		System.out.println(jedis.rpush("key2", "e"));
+		Common.print(jedis);
+		System.out.println(jedis.blpop(1, "key", "key2"));
+		Common.print(jedis);
+		System.out.println(jedis.blpop(1, "key", "key2"));
+		Common.print(jedis);
+		System.out.println(jedis.blpop(1, "key", "key2"));
+		Common.print(jedis);
+		// 测试阻塞
+		executorService.execute(() -> {
+			System.out.println("new thread start");
+			try {
+				Thread.sleep(2000L);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			// 这里需要换一个新的jedis实例
+			Common.getJedis().rpush("key", "value");
+			System.out.println("new thread stop");
+		});
+		System.out.println(jedis.blpop(10, "key"));
+		System.out.println("BRPOP/BRPOPLPUSH和BLPOP都一样的,懒得写了");
 	}
 
 }
