@@ -24,7 +24,13 @@ public class JedisZSetTest {
 	}
 
 	@Test
-	public void test() throws Exception {
+	public void zadd() {
+		// ZADD key [NX|XX] [CH] [INCR] score member [score member ...]
+
+	}
+
+	@Test
+	public void test() {
 		jedis.zadd("test", 1, "3");
 		jedis.zadd("test", 2, "1");
 		jedis.zadd("test", 3, "2");
@@ -34,10 +40,6 @@ public class JedisZSetTest {
 
 		Common.print(jedis);
 
-		jedis.flushAll();
-		Common.print(jedis);
-
-		jedis.disconnect();
 	}
 
 }
