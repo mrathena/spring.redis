@@ -210,19 +210,4 @@ public class JedisSetTest {
 		Common.print(jedis);
 	}
 
-	@Test
-	public void test() {
-
-		System.out.println(jedis.spop("test"));
-		Common.print(jedis);
-
-		System.out.println(jedis.spop("test"));
-		Common.print(jedis);
-
-		jedis.flushAll();
-		Common.print(jedis);
-
-		jedis.disconnect();
-	}
-
 }

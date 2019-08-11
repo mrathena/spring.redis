@@ -31,6 +31,17 @@ public class JedisTest {
 	}
 
 	@Test
+	public void expire() {
+		// EXPIRE
+		System.out.println(jedis.exists("string"));
+		System.out.println(jedis.exists("string", "key2"));
+		System.out.println(jedis.exists("list"));
+		System.out.println(jedis.exists("set"));
+		System.out.println(jedis.exists("hash"));
+		System.out.println(jedis.exists("zset"));
+	}
+
+	@Test
 	public void exist() {
 		System.out.println(jedis.exists("string"));
 		System.out.println(jedis.exists("string", "key2"));
