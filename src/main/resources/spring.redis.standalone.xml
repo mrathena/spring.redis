@@ -8,22 +8,25 @@
 		<property name="locations" value="config.properties"/>
 	</bean>
 
+	<!--配置了但是也没有用上-->
 	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
 		<property name="testOnBorrow" value="true"/>
 	</bean>
 
 	<bean id="redisStandaloneConfiguration"
 		  class="org.springframework.data.redis.connection.RedisStandaloneConfiguration">
-		<constructor-arg name="hostName" value="${redis.standalone.master.host}"/>
-		<constructor-arg name="port" value="${redis.standalone.master.part}"/>
-		<property name="database" value="${redis.standalone.master.database}"/>
+		<constructor-arg name="hostName" value="${spring.redis.master.host}"/>
+		<constructor-arg name="port" value="${spring.redis.master.port}"/>
+		<property name="database" value="${spring.redis.database}"/>
 		<property name="password">
+			<!--这里的of本不应该报红的-->
 			<bean class="org.springframework.data.redis.connection.RedisPassword" factory-method="of">
-				<constructor-arg name="passwordAsString" value="${redis.standalone.master.password}"/>
+				<constructor-arg name="passwordAsString" value="${spring.redis.password}"/>
 			</bean>
 		</property>
 	</bean>
 
+	<!--貌似以前的配置都有传JedisPoolConfig的,但是这个传不进去-->
 	<!--RedisConnectionFactory有两种SpringFramework实现类,JedisConnectionFactory/LettuceConnectionFactory-->
 	<bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
 		<constructor-arg name="standaloneConfig" ref="redisStandaloneConfiguration"/>

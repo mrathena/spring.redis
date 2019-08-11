@@ -3,9 +3,11 @@
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
 
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations" value="config.properties"/>
+	</bean>
+
 	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
-		<property name="maxTotal" value="10"/>
-		<property name="maxIdle" value="10"/>
 		<property name="minIdle" value="1"/>
 		<!--从池中取出Jedis实例时是否校验可用,验证失败该实例被移除,并创建一个可用的新的实例,然后再被取出来-->
 		<property name="testOnBorrow" value="true"/>
@@ -14,24 +16,31 @@
 	<bean id="redisSentinelConfiguration" class="org.springframework.data.redis.connection.RedisSentinelConfiguration">
 		<property name="master">
 			<bean class="org.springframework.data.redis.connection.RedisNode">
-				<property name="name" value="mymaster"/>
+				<property name="name" value="${spring.redis.sentinel.master}"/>
 			</bean>
 		</property>
 		<property name="sentinels">
 			<set>
 				<bean class="org.springframework.data.redis.connection.RedisNode">
-					<constructor-arg name="host" value="172.17.46.11"/>
-					<constructor-arg name="port" value="26379"/>
+					<constructor-arg name="host" value="${spring.redis.sentinel1.host}"/>
+					<constructor-arg name="port" value="${spring.redis.sentinel1.port}"/>
 				</bean>
 				<bean class="org.springframework.data.redis.connection.RedisNode">
-					<constructor-arg name="host" value="172.17.46.11"/>
-					<constructor-arg name="port" value="26379"/>
+					<constructor-arg name="host" value="${spring.redis.sentinel2.host}"/>
+					<constructor-arg name="port" value="${spring.redis.sentinel2.port}"/>
 				</bean>
 				<bean class="org.springframework.data.redis.connection.RedisNode">
-					<constructor-arg name="host" value="172.17.46.11"/>
-					<constructor-arg name="port" value="26379"/>
+					<constructor-arg name="host" value="${spring.redis.sentinel3.host}"/>
+					<constructor-arg name="port" value="${spring.redis.sentinel3.port}"/>
 				</bean>
 			</set>
+		</property>
+		<property name="database" value="${spring.redis.database}"/>
+		<property name="password">
+			<!--这里的of本不应该报红的-->
+			<bean class="org.springframework.data.redis.connection.RedisPassword" factory-method="of">
+				<constructor-arg name="passwordAsString" value="${spring.redis.password}"/>
+			</bean>
 		</property>
 	</bean>
 
@@ -41,12 +50,16 @@
 		<constructor-arg name="poolConfig" ref="jedisPoolConfig"/>
 	</bean>
 
+	<bean id="stringRedisSerializer" class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+	<bean id="genericJackson2JsonRedisSerializer" class="org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer"/>
+
 	<!--RedisTemplate继承于RedisAccessor,需要配置一个RedisConnectionFactory-->
 	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
 		<property name="connectionFactory" ref="jedisConnectionFactory"/>
-		<property name="defaultSerializer">
-			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
-		</property>
+		<property name="keySerializer" ref="stringRedisSerializer"/>
+		<property name="valueSerializer" ref="genericJackson2JsonRedisSerializer"/>
+		<property name="hashKeySerializer" ref="stringRedisSerializer"/>
+		<property name="hashValueSerializer" ref="genericJackson2JsonRedisSerializer"/>
 	</bean>
 
 	<bean id="stringRedisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">
