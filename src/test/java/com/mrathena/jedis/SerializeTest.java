@@ -1,14 +1,26 @@
 package com.mrathena.jedis;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
-import com.mrathena.KryoKit;
+import com.alibaba.fastjson.parser.ParserConfig;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson.support.config.FastJsonConfig;
+import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mrathena.spring.redis.serializer.CustomFastJsonRedisSerializer;
+import com.mrathena.spring.redis.serializer.CustomKryoRedisSerializer;
 import com.mrathena.toolkit.IdKit;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import redis.clients.jedis.Jedis;
 
 import java.io.*;
@@ -19,151 +31,45 @@ import java.util.*;
  */
 public class SerializeTest {
 
-	public static void main(String[] args) throws Exception {
+	private Jedis jedis;
 
-		Jedis jedis = Common.getJedis();
+	private String key = "test";
+	private byte[] k, v1, v2, v3, v4, v5;
 
-		// ----------------------------------------------------------------
-		// 序列化测试
-		Base base = getBase();
-		System.out.println(base);
-		System.out.println();
+	private int times = 100;
+	private long start, interval;
 
-		// 序列化key
-		byte[] key, bytes;
-		long start, interval;
-		Base newBase;
-		Complex newComplex;
+	private Base base;
+	private Complex complex;
+	private List<Complex> complexList = new LinkedList<>();
+	private Set<Complex> complexSet = new LinkedHashSet<>();
+	private Map<String, Object> complexMap = new LinkedHashMap<>();
 
-		key = jdkSerialize("base");
+	private static JdkSerializationRedisSerializer jdkSerializationRedisSerializer;
+	private static GenericJackson2JsonRedisSerializer genericJackson2JsonRedisSerializer;
+	private static Jackson2JsonRedisSerializer jackson2JsonRedisSerializer;
+	private static FastJsonRedisSerializer fastJsonRedisSerializer;
+	private static CustomFastJsonRedisSerializer customFastJsonRedisSerializer;
+	private static CustomKryoRedisSerializer customKryoRedisSerializer;
 
-		// java默认序列化
-		start = System.nanoTime();
-		bytes = jdkSerialize(base);
-		interval = System.nanoTime() - start;
-		System.out.println("jdkSerialize: interval:" + interval + ", size:" + bytes.length);
-		// set
-		jedis.set(key, bytes);
-		// java默认反序列化
-		start = System.nanoTime();
-		newBase = jdkDeserialize(jedis.get(key), Base.class);
-		interval = System.nanoTime() - start;
-		System.out.println("jdkDeserialize: interval:" + interval);
-		System.out.println(newBase);
-		System.out.println();
+	private void initTestData() {
+		base = getBase();
 
-		// json默认序列化
-		start = System.nanoTime();
-		bytes = jsonSerialize(base);
-		interval = System.nanoTime() - start;
-		System.out.println("jsonSerialize: interval:" + interval + ", size:" + bytes.length);
-		// set
-		jedis.set(key, bytes);
-		// json默认反序列化
-		start = System.nanoTime();
-		newBase = jsonDeserialize(jedis.get(key), Base.class);
-		interval = System.nanoTime() - start;
-		System.out.println("jsonDeserialize: interval:" + interval);
-		System.out.println(newBase);
-		System.out.println();
+		complex = getComplex();
 
-		// kryo默认序列化
-		start = System.nanoTime();
-		bytes = kryoSerialize(base);
-		interval = System.nanoTime() - start;
-		System.out.println("kryoSerialize: interval:" + interval + ", size:" + bytes.length);
-		// set
-		jedis.set(key, bytes);
-		// kryo默认反序列化
-		start = System.nanoTime();
-		newBase = kryoDeserialize(jedis.get(key));
-		interval = System.nanoTime() - start;
-		System.out.println("kryoDeserialize: interval:" + interval);
-		System.out.println(newBase);
-		System.out.println();
-		System.out.println();
-		System.out.println();
-		System.out.println();
-		System.out.println();
-
-		// ----------------------------------------------------------------
-		// 组合对象测试
-		Complex complex = getComplex();
-
-		System.out.println(complex);
-		System.out.println();
-
-		key = jdkSerialize("complex");
-
-		// java默认序列化
-		start = System.nanoTime();
-		bytes = jdkSerialize(complex);
-		interval = System.nanoTime() - start;
-		System.out.println("jdkSerialize: interval:" + interval + ", size:" + bytes.length);
-		// set
-		jedis.set(key, bytes);
-		// java默认反序列化
-		start = System.nanoTime();
-		newComplex = jdkDeserialize(jedis.get(key), Complex.class);
-		interval = System.nanoTime() - start;
-		System.out.println("jdkDeserialize: interval:" + interval);
-		System.out.println(newComplex);
-		System.out.println();
-
-		// json默认序列化
-		start = System.nanoTime();
-		bytes = jsonSerialize(complex);
-		interval = System.nanoTime() - start;
-		System.out.println("jsonSerialize: interval:" + interval + ", size:" + bytes.length);
-		// set
-		jedis.set(key, bytes);
-		// json默认反序列化
-		start = System.nanoTime();
-		newComplex = jsonDeserialize(jedis.get(key), Complex.class);
-		interval = System.nanoTime() - start;
-		System.out.println("jsonDeserialize: interval:" + interval);
-		System.out.println(newComplex);
-		System.out.println();
-
-		// kryo默认序列化
-		start = System.nanoTime();
-		bytes = kryoSerialize(complex);
-		interval = System.nanoTime() - start;
-		System.out.println("kryoSerialize: interval:" + interval + ", size:" + bytes.length);
-		// set
-		jedis.set(key, bytes);
-		// kryo默认反序列化
-		start = System.nanoTime();
-		newComplex = kryoDeserialize(jedis.get(key));
-		interval = System.nanoTime() - start;
-		System.out.println("kryoDeserialize: interval:" + interval);
-		System.out.println(newComplex);
-		System.out.println();
-
-		// ----------------------------------------------------------------
-		List<Complex> complexList = new LinkedList<>();
 		complexList.add(getComplex());
 		complexList.add(getComplex());
 		complexList.add(getComplex());
 		complexList.add(getComplex());
-		System.out.println(jdkSerialize(complexList).length);
-		System.out.println(JSON.toJSONBytes(complexList).length);
-		System.out.println(KryoKit.writeToByteArray(complexList).length);
-		System.out.println(JSON.parseArray(JSON.toJSONString(complexList), Complex.class));
-		System.out.println(JSON.parseObject(JSON.toJSONString(complexList), new TypeReference<List<Complex>>() {}));
 
-		Set<Complex> complexSet = new HashSet<>();
 		complexSet.add(getComplex());
 		complexSet.add(getComplex());
 		complexSet.add(getComplex());
 		complexSet.add(getComplex());
-		System.out.println(jdkSerialize(complexSet).length);
-		System.out.println(JSON.toJSONBytes(complexSet).length);
-		System.out.println(KryoKit.writeToByteArray(complexSet).length);
-		System.out.println(JSON.parseArray(JSON.toJSONString(complexSet), Complex.class));
-		System.out.println(JSON.parseObject(JSON.toJSONString(complexSet), new TypeReference<Set<Complex>>() {}));
 
-		Map<String, List<Complex>> complexMap = new HashMap<>(4);
+		complexMap.put(IdKit.generateUUID(), base);
+		complexMap.put(IdKit.generateUUID(), complex);
+		complexMap.put(IdKit.generateUUID(), complexSet);
 		complexMap.put(IdKit.generateUUID(), complexList);
 		List<Complex> complexList2 = new LinkedList<>();
 		complexList2.add(getComplex());
@@ -183,21 +89,337 @@ public class SerializeTest {
 		complexList4.add(getComplex());
 		complexList4.add(getComplex());
 		complexMap.put(IdKit.generateUUID(), complexList4);
-		System.out.println(jdkSerialize(complexMap).length);
-		System.out.println(JSON.toJSONBytes(complexMap).length);
-		System.out.println(KryoKit.writeToByteArray(complexMap).length);
-		System.out.println(JSON.parseObject(JSON.toJSONString(complexMap), Map.Entry.class));
-		System.out.println(JSON.parseObject(JSON.toJSONString(complexMap), new TypeReference<Map<String, List<Complex>>>() {}));
-
-		jedis.flushAll();
-		Common.print(jedis);
-
-		jedis.disconnect();
-
 	}
 
+	private void initTestSerializer() {
+		jdkSerializationRedisSerializer = new JdkSerializationRedisSerializer();
+		genericJackson2JsonRedisSerializer = new GenericJackson2JsonRedisSerializer();
+		Jackson2JsonRedisSerializer<Object> objectJackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+		objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+		objectJackson2JsonRedisSerializer.setObjectMapper(objectMapper);
+		jackson2JsonRedisSerializer = objectJackson2JsonRedisSerializer;
+		FastJsonRedisSerializer<Object> objectFastJsonRedisSerializer = new FastJsonRedisSerializer<>(Object.class);
+		ParserConfig.getGlobalInstance().setAutoTypeSupport(true);
+		// 开启FastJson的AutoType,可以给Json中写入class信息
+		FastJsonConfig fastJsonConfig = new FastJsonConfig();
+		fastJsonConfig.setDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+		fastJsonConfig.setSerializerFeatures(SerializerFeature.WriteMapNullValue, SerializerFeature.WriteClassName);
+		objectFastJsonRedisSerializer.setFastJsonConfig(fastJsonConfig);
+		// 如果没有SerializerFeature.WriteMapNullValue,序列化后的json中没有值为null的字段
+		fastJsonRedisSerializer = objectFastJsonRedisSerializer;
+		customFastJsonRedisSerializer = new CustomFastJsonRedisSerializer<>(Object.class);
+		customKryoRedisSerializer = new CustomKryoRedisSerializer<>(Object.class);
+	}
+
+	@Before
+	public void before() {
+		this.jedis = Common.getJedis();
+		initTestData();
+		initTestSerializer();
+	}
+
+	@After
+	public void after() {
+		jedis.flushDB();
+		jedis.disconnect();
+	}
+
+	@Test
+	public void jdkUsabilityTest() throws Exception {
+		// 易用性测试
+		k = jdkSerialize(key);
+		System.out.println(jdkDeserialize(k));
+		v1 = jdkSerialize(base);
+		System.out.println(jdkDeserialize(v1));
+		v2 = jdkSerialize(complex);
+		System.out.println(jdkDeserialize(v2));
+		v3 = jdkSerialize(complexList);
+		System.out.println(jdkDeserialize(v3));
+		v4 = jdkSerialize(complexSet);
+		System.out.println(jdkDeserialize(v4));
+		v5 = jdkSerialize(complexMap);
+		System.out.println(jdkDeserialize(v5));
+	}
+
+	@Test
+	public void genericJackson2JsonUsabilityTest() {
+		// 易用性测试
+		k = genericJackson2JsonSerialize(key);
+		System.out.println(genericJackson2JsonDeserialize(k));
+		v1 = genericJackson2JsonSerialize(base);
+		System.out.println(genericJackson2JsonDeserialize(v1));
+		v2 = genericJackson2JsonSerialize(complex);
+		System.out.println(genericJackson2JsonDeserialize(v2));
+		v3 = genericJackson2JsonSerialize(complexList);
+		System.out.println(genericJackson2JsonDeserialize(v3));
+		v4 = genericJackson2JsonSerialize(complexSet);
+		System.out.println(genericJackson2JsonDeserialize(v4));
+		v5 = genericJackson2JsonSerialize(complexMap);
+		System.out.println(genericJackson2JsonDeserialize(v5));
+	}
+
+	@Test
+	public void customKryoUsabilityTest() {
+		// 易用性测试
+		k = customKryoSerialize(key);
+		System.out.println(customKryoDeserialize(k));
+		v1 = customKryoSerialize(base);
+		System.out.println(customKryoDeserialize(v1));
+		v2 = customKryoSerialize(complex);
+		System.out.println(customKryoDeserialize(v2));
+		v3 = customKryoSerialize(complexList);
+		System.out.println(customKryoDeserialize(v3));
+		v4 = customKryoSerialize(complexSet);
+		System.out.println(customKryoDeserialize(v4));
+		v5 = customKryoSerialize(complexMap);
+		System.out.println(customKryoDeserialize(v5));
+	}
+
+	@Test
+	public void jdkSizeTest() throws Exception {
+		// 空间测试
+		// 11
+		// 239
+		// 6477
+		// 21853
+		// 21861
+		// 109312
+		k = jdkSerialize(key);
+		System.out.println(k.length);
+		v1 = jdkSerialize(base);
+		System.out.println(v1.length);
+		v2 = jdkSerialize(complex);
+		System.out.println(v2.length);
+		v3 = jdkSerialize(complexList);
+		System.out.println(v3.length);
+		v4 = jdkSerialize(complexSet);
+		System.out.println(v4.length);
+		v5 = jdkSerialize(complexMap);
+		System.out.println(v5.length);
+	}
+
+	@Test
+	public void genericJackson2JsonSizeTest() {
+		// 空间测试
+		// 6
+		// 261
+		// 15842
+		// 63394
+		// 63315
+		// 333127
+		k = genericJackson2JsonSerialize(key);
+		System.out.println(k.length);
+		v1 = genericJackson2JsonSerialize(base);
+		System.out.println(v1.length);
+		v2 = genericJackson2JsonSerialize(complex);
+		System.out.println(v2.length);
+		v3 = genericJackson2JsonSerialize(complexList);
+		System.out.println(v3.length);
+		v4 = genericJackson2JsonSerialize(complexSet);
+		System.out.println(v4.length);
+		v5 = genericJackson2JsonSerialize(complexMap);
+		System.out.println(v5.length);
+	}
+
+	@Test
+	public void customKryoSizeTest() {
+		// 空间测试
+		// 5
+		// 89
+		// 4939
+		// 18722
+		// 18723
+		// 97095
+		k = customKryoSerialize(key);
+		System.out.println(k.length);
+		v1 = customKryoSerialize(base);
+		System.out.println(v1.length);
+		v2 = customKryoSerialize(complex);
+		System.out.println(v2.length);
+		v3 = customKryoSerialize(complexList);
+		System.out.println(v3.length);
+		v4 = customKryoSerialize(complexSet);
+		System.out.println(v4.length);
+		v5 = customKryoSerialize(complexMap);
+		System.out.println(v5.length);
+	}
+
+	@Test
+	public void jdkTimeTest() throws Exception {
+		// 时间测试
+		// 3953100
+		// 10429800
+		// 91513200
+		// 130352300
+		// 91800500
+		// 274185500
+		start = System.nanoTime();
+		for (int i = 0; i < times; i++) {
+			k = jdkSerialize(key);
+			jdkDeserialize(k);
+		}
+		interval = System.nanoTime() - start;
+		System.out.println(interval);
+
+		start = System.nanoTime();
+		for (int i = 0; i < times; i++) {
+			v1 = jdkSerialize(base);
+			jdkDeserialize(v1);
+		}
+		interval = System.nanoTime() - start;
+		System.out.println(interval);
+
+		start = System.nanoTime();
+		for (int i = 0; i < times; i++) {
+			v2 = jdkSerialize(complex);
+			jdkDeserialize(v2);
+		}
+		interval = System.nanoTime() - start;
+		System.out.println(interval);
+
+		start = System.nanoTime();
+		for (int i = 0; i < times; i++) {
+			v3 = jdkSerialize(complexList);
+			jdkDeserialize(v3);
+		}
+		interval = System.nanoTime() - start;
+		System.out.println(interval);
+
+		start = System.nanoTime();
+		for (int i = 0; i < times; i++) {
+			v4 = jdkSerialize(complexSet);
+			jdkDeserialize(v4);
+		}
+		interval = System.nanoTime() - start;
+		System.out.println(interval);
+
+		start = System.nanoTime();
+		for (int i = 0; i < times; i++) {
+			v5 = jdkSerialize(complexMap);
+			jdkDeserialize(v5);
+		}
+		interval = System.nanoTime() - start;
+		System.out.println(interval);
+	}
+
+	@Test
+	public void genericJackson2JsonTimeTest() {
+		// 时间测试
+		// 39623700
+		// 82173500
+		// 139210700
+		// 142158700
+		// 98928500
+		// 418888700
+		start = System.nanoTime();
+		for (int i = 0; i < times; i++) {
+			k = genericJackson2JsonSerialize(key);
+			genericJackson2JsonDeserialize(k);
+		}
+		interval = System.nanoTime() - start;
+		System.out.println(interval);
+
+		start = System.nanoTime();
+		for (int i = 0; i < times; i++) {
+			v1 = genericJackson2JsonSerialize(base);
+			genericJackson2JsonDeserialize(v1);
+		}
+		interval = System.nanoTime() - start;
+		System.out.println(interval);
+
+		start = System.nanoTime();
+		for (int i = 0; i < times; i++) {
+			v2 = genericJackson2JsonSerialize(complex);
+			genericJackson2JsonDeserialize(v2);
+		}
+		interval = System.nanoTime() - start;
+		System.out.println(interval);
+
+		start = System.nanoTime();
+		for (int i = 0; i < times; i++) {
+			v3 = genericJackson2JsonSerialize(complexList);
+			genericJackson2JsonDeserialize(v3);
+		}
+		interval = System.nanoTime() - start;
+		System.out.println(interval);
+
+		start = System.nanoTime();
+		for (int i = 0; i < times; i++) {
+			v4 = genericJackson2JsonSerialize(complexSet);
+			genericJackson2JsonDeserialize(v4);
+		}
+		interval = System.nanoTime() - start;
+		System.out.println(interval);
+
+		start = System.nanoTime();
+		for (int i = 0; i < times; i++) {
+			v5 = genericJackson2JsonSerialize(complexMap);
+			genericJackson2JsonDeserialize(v5);
+		}
+		interval = System.nanoTime() - start;
+		System.out.println(interval);
+	}
+
+	@Test
+	public void customKryoTimeTest() {
+		// 时间测试
+		// 各种报错还测个屁
+		start = System.nanoTime();
+		for (int i = 0; i < times; i++) {
+			k = customKryoSerialize(key);
+			customKryoDeserialize(k);
+		}
+		interval = System.nanoTime() - start;
+		System.out.println(interval);
+
+		start = System.nanoTime();
+		for (int i = 0; i < times; i++) {
+			v1 = customKryoSerialize(base);
+			customKryoDeserialize(v1);
+		}
+		interval = System.nanoTime() - start;
+		System.out.println(interval);
+
+		start = System.nanoTime();
+		for (int i = 0; i < times; i++) {
+			v2 = customKryoSerialize(complex);
+			customKryoDeserialize(v2);
+		}
+		interval = System.nanoTime() - start;
+		System.out.println(interval);
+
+		start = System.nanoTime();
+		for (int i = 0; i < times; i++) {
+			v3 = customKryoSerialize(complexList);
+			customKryoDeserialize(v3);
+		}
+		interval = System.nanoTime() - start;
+		System.out.println(interval);
+
+		start = System.nanoTime();
+		for (int i = 0; i < times; i++) {
+			v4 = customKryoSerialize(complexSet);
+			customKryoDeserialize(v4);
+		}
+		interval = System.nanoTime() - start;
+		System.out.println(interval);
+
+		start = System.nanoTime();
+		for (int i = 0; i < times; i++) {
+			v5 = customKryoSerialize(complexMap);
+			customKryoDeserialize(v5);
+		}
+		interval = System.nanoTime() - start;
+		System.out.println(interval);
+	}
+
+	/**
+	 * 从spring的JdkSerializationRedisSerializer里抄出来的
+	 */
 	private static byte[] jdkSerialize(Object object) throws Exception {
-		try (ByteArrayOutputStream baos = new ByteArrayOutputStream(4096);
+		try (ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
 		     ObjectOutputStream oos = new ObjectOutputStream(baos)
 		) {
 			oos.writeObject(object);
@@ -206,11 +428,13 @@ public class SerializeTest {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private static <T> T jdkDeserialize(byte[] bytes, Class<T> clazz) throws Exception {
-		T object = null;
+	/**
+	 * 可以从spring的JdkSerializationRedisSerializer里抄,但是没有
+	 */
+	private static Object jdkDeserialize(byte[] bytes) throws Exception {
+		Object object = null;
 		try (ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bytes))) {
-			object = (T) ois.readObject();
+			object = ois.readObject();
 			return object;
 		} catch (EOFException e) {
 			// EOFException仅仅是流到达最末尾的标记,捕获该异常后,直接处理之前的数据就好了,无需处理该异常
@@ -218,20 +442,20 @@ public class SerializeTest {
 		}
 	}
 
-	private static byte[] jsonSerialize(Object object) {
-		return JSON.toJSONBytes(object);
+	private static byte[] genericJackson2JsonSerialize(Object object) {
+		return genericJackson2JsonRedisSerializer.serialize(object);
 	}
 
-	private static <T> T jsonDeserialize(byte[] bytes, Class<T> clazz) {
-		return JSON.parseObject(bytes, clazz);
+	private static Object genericJackson2JsonDeserialize(byte[] bytes) {
+		return genericJackson2JsonRedisSerializer.deserialize(bytes);
 	}
 
-	private static byte[] kryoSerialize(Object object) throws IOException {
-		return KryoKit.writeToByteArray(object);
+	private static byte[] customKryoSerialize(Object object) {
+		return customKryoRedisSerializer.serialize(object);
 	}
 
-	private static <T> T kryoDeserialize(byte[] bytes) {
-		return KryoKit.readFromByteArray(bytes);
+	private static Object customKryoDeserialize(byte[] bytes) {
+		return customKryoRedisSerializer.deserialize(bytes);
 	}
 
 	private static Base getBase() {

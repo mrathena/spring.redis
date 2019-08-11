@@ -14,11 +14,11 @@ import java.io.ByteArrayOutputStream;
  * @author mrathena on 2019/8/3 18:06
  */
 public class CustomKryoRedisSerializer<T> implements RedisSerializer<T> {
-	Logger logger = LoggerFactory.getLogger(CustomKryoRedisSerializer.class);
+	private Logger logger = LoggerFactory.getLogger(CustomKryoRedisSerializer.class);
 
-	public static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
+	private static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
 
-	private static final ThreadLocal<Kryo> kryos = ThreadLocal.withInitial(Kryo::new);
+	private static final ThreadLocal<Kryo> KRYO_THREAD_LOCAL = ThreadLocal.withInitial(Kryo::new);
 
 	private Class<T> clazz;
 
@@ -28,18 +28,18 @@ public class CustomKryoRedisSerializer<T> implements RedisSerializer<T> {
 	}
 
 	@Override
-	public byte[] serialize(T t) throws SerializationException {
-		if (t == null) {
+	public byte[] serialize(Object object) throws SerializationException {
+		if (object == null) {
 			return EMPTY_BYTE_ARRAY;
 		}
 
-		Kryo kryo = kryos.get();
+		Kryo kryo = KRYO_THREAD_LOCAL.get();
 		kryo.setReferences(false);
 		kryo.register(clazz);
 
 		try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			 Output output = new Output(baos)) {
-			kryo.writeClassAndObject(output, t);
+			kryo.writeClassAndObject(output, object);
 			output.flush();
 			return baos.toByteArray();
 		} catch (Exception e) {
@@ -55,7 +55,7 @@ public class CustomKryoRedisSerializer<T> implements RedisSerializer<T> {
 			return null;
 		}
 
-		Kryo kryo = kryos.get();
+		Kryo kryo = KRYO_THREAD_LOCAL.get();
 		kryo.setReferences(false);
 		kryo.register(clazz);
 

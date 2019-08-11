@@ -315,7 +315,7 @@ public class RedisStandaloneTest {
 		// 支持自增自减操作
 		// 默认会去掉值为null的字段(可以设置支持),默认不支持AutoType(可以设置支持)
 		// 默认反序列化后的类型为JsonObject和JsonArray,不能直接到JavaBean(开启AutoType后可以)
-		// // 序列化结果不是标准JSON
+		// 序列化结果不是标准JSON
 	}
 
 	@Test
@@ -353,6 +353,7 @@ public class RedisStandaloneTest {
 		// com.mrathena.spring.redis.serializer.CustomKryoRedisSerializer
 		// 不支持自增自减操作
 		// 序列化后不便查看,但据说占用空间很小
+		// list等集合不支持
 	}
 
 }
