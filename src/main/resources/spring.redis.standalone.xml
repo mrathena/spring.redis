@@ -1,11 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
-	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   http://www.springframework.org/schema/beans/spring-beans.xsd ">
 
-	<bean id="redisStandaloneConfiguration" class="org.springframework.data.redis.connection.RedisStandaloneConfiguration">
-		<constructor-arg name="hostName" value="172.17.46.11"/>
-		<constructor-arg name="port" value="26380"/>
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations" value="config.properties"/>
+	</bean>
+
+	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="testOnBorrow" value="true"/>
+	</bean>
+
+	<bean id="redisStandaloneConfiguration"
+		  class="org.springframework.data.redis.connection.RedisStandaloneConfiguration">
+		<constructor-arg name="hostName" value="${redis.standalone.master.host}"/>
+		<constructor-arg name="port" value="${redis.standalone.master.part}"/>
+		<property name="database" value="${redis.standalone.master.database}"/>
+		<property name="password">
+			<bean class="org.springframework.data.redis.connection.RedisPassword" factory-method="of">
+				<constructor-arg name="passwordAsString" value="${redis.standalone.master.password}"/>
+			</bean>
+		</property>
 	</bean>
 
 	<!--RedisConnectionFactory有两种SpringFramework实现类,JedisConnectionFactory/LettuceConnectionFactory-->

@@ -161,20 +161,20 @@ public class SerializeTest {
 	}
 
 	@Test
-	public void customKryoUsabilityTest() {
+	public void fastJsonUsabilityTest() {
 		// 易用性测试
-		k = customKryoSerialize(key);
-		System.out.println(customKryoDeserialize(k));
-		v1 = customKryoSerialize(base);
-		System.out.println(customKryoDeserialize(v1));
-		v2 = customKryoSerialize(complex);
-		System.out.println(customKryoDeserialize(v2));
-		v3 = customKryoSerialize(complexList);
-		System.out.println(customKryoDeserialize(v3));
-		v4 = customKryoSerialize(complexSet);
-		System.out.println(customKryoDeserialize(v4));
-		v5 = customKryoSerialize(complexMap);
-		System.out.println(customKryoDeserialize(v5));
+		k = fastJsonSerialize(key);
+		System.out.println(fastJsonDeserialize(k));
+		v1 = fastJsonSerialize(base);
+		System.out.println(fastJsonDeserialize(v1));
+		v2 = fastJsonSerialize(complex);
+		System.out.println(fastJsonDeserialize(v2));
+		v3 = fastJsonSerialize(complexList);
+		System.out.println(fastJsonDeserialize(v3));
+		v4 = fastJsonSerialize(complexSet);
+		System.out.println(fastJsonDeserialize(v4));
+		v5 = fastJsonSerialize(complexMap);
+		System.out.println(fastJsonDeserialize(v5));
 	}
 
 	@Test
@@ -224,7 +224,7 @@ public class SerializeTest {
 	}
 
 	@Test
-	public void customKryoSizeTest() {
+	public void fastJsonSizeTest() {
 		// 空间测试
 		// 5
 		// 89
@@ -232,17 +232,17 @@ public class SerializeTest {
 		// 18722
 		// 18723
 		// 97095
-		k = customKryoSerialize(key);
+		k = fastJsonSerialize(key);
 		System.out.println(k.length);
-		v1 = customKryoSerialize(base);
+		v1 = fastJsonSerialize(base);
 		System.out.println(v1.length);
-		v2 = customKryoSerialize(complex);
+		v2 = fastJsonSerialize(complex);
 		System.out.println(v2.length);
-		v3 = customKryoSerialize(complexList);
+		v3 = fastJsonSerialize(complexList);
 		System.out.println(v3.length);
-		v4 = customKryoSerialize(complexSet);
+		v4 = fastJsonSerialize(complexSet);
 		System.out.println(v4.length);
-		v5 = customKryoSerialize(complexMap);
+		v5 = fastJsonSerialize(complexMap);
 		System.out.println(v5.length);
 	}
 
@@ -363,53 +363,58 @@ public class SerializeTest {
 	}
 
 	@Test
-	public void customKryoTimeTest() {
+	public void fastJsonTimeTest() {
 		// 时间测试
-		// 各种报错还测个屁
+		// 7398000
+		// 47853700
+		// 192133100
+		// 275303900
+		// 132522300
+		// 679553300
 		start = System.nanoTime();
 		for (int i = 0; i < times; i++) {
-			k = customKryoSerialize(key);
-			customKryoDeserialize(k);
+			k = fastJsonSerialize(key);
+			fastJsonDeserialize(k);
 		}
 		interval = System.nanoTime() - start;
 		System.out.println(interval);
 
 		start = System.nanoTime();
 		for (int i = 0; i < times; i++) {
-			v1 = customKryoSerialize(base);
-			customKryoDeserialize(v1);
+			v1 = fastJsonSerialize(base);
+			fastJsonDeserialize(v1);
 		}
 		interval = System.nanoTime() - start;
 		System.out.println(interval);
 
 		start = System.nanoTime();
 		for (int i = 0; i < times; i++) {
-			v2 = customKryoSerialize(complex);
-			customKryoDeserialize(v2);
+			v2 = fastJsonSerialize(complex);
+			fastJsonDeserialize(v2);
 		}
 		interval = System.nanoTime() - start;
 		System.out.println(interval);
 
 		start = System.nanoTime();
 		for (int i = 0; i < times; i++) {
-			v3 = customKryoSerialize(complexList);
-			customKryoDeserialize(v3);
+			v3 = fastJsonSerialize(complexList);
+			fastJsonDeserialize(v3);
 		}
 		interval = System.nanoTime() - start;
 		System.out.println(interval);
 
 		start = System.nanoTime();
 		for (int i = 0; i < times; i++) {
-			v4 = customKryoSerialize(complexSet);
-			customKryoDeserialize(v4);
+			v4 = fastJsonSerialize(complexSet);
+			fastJsonDeserialize(v4);
 		}
 		interval = System.nanoTime() - start;
 		System.out.println(interval);
 
 		start = System.nanoTime();
 		for (int i = 0; i < times; i++) {
-			v5 = customKryoSerialize(complexMap);
-			customKryoDeserialize(v5);
+			v5 = fastJsonSerialize(complexMap);
+			fastJsonDeserialize(v5);
 		}
 		interval = System.nanoTime() - start;
 		System.out.println(interval);
@@ -450,12 +455,12 @@ public class SerializeTest {
 		return genericJackson2JsonRedisSerializer.deserialize(bytes);
 	}
 
-	private static byte[] customKryoSerialize(Object object) {
-		return customKryoRedisSerializer.serialize(object);
+	private static byte[] fastJsonSerialize(Object object) {
+		return fastJsonRedisSerializer.serialize(object);
 	}
 
-	private static Object customKryoDeserialize(byte[] bytes) {
-		return customKryoRedisSerializer.deserialize(bytes);
+	private static Object fastJsonDeserialize(byte[] bytes) {
+		return fastJsonRedisSerializer.deserialize(bytes);
 	}
 
 	private static Base getBase() {
@@ -470,11 +475,14 @@ public class SerializeTest {
 
 	private static Complex getComplex() {
 		Complex complex = new Complex().setName(IdKit.generateUUID());
-		List<String> stringList = Collections.singletonList(IdKit.generateUUID());
+		List<String> stringList = new LinkedList<>();
+		stringList.add(IdKit.generateUUID());
 		complex.setStringList(stringList);
-		Set<String> stringSet = Collections.singleton(IdKit.generateUUID());
+		Set<String> stringSet = new HashSet<>();
+		stringSet.add(IdKit.generateUUID());
 		complex.setStringSet(stringSet);
-		Map<String, String> stringMap = Collections.singletonMap(IdKit.generateUUID(), IdKit.generateUUID());
+		Map<String, String> stringMap = new HashMap<>();
+		stringMap.put(IdKit.generateUUID(), IdKit.generateUUID());
 		complex.setStringMap(stringMap);
 		complex.setBase(getBase());
 		List<Base> list = Arrays.asList(getBase(), getBase(), getBase(), getBase(), getBase());

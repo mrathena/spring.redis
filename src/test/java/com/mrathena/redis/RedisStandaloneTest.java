@@ -31,7 +31,7 @@ import java.util.*;
 @ContextConfiguration("classpath:spring.redis.standalone.xml")
 public class RedisStandaloneTest {
 
-	private static final String K = "MRATHENA:SPRING.REDIS:TEST";
+	private static final String K = "key";
 
 	@Autowired
 	private RedisTemplate<String, Object> redisTemplate;
