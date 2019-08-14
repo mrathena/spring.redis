@@ -1,17 +1,24 @@
 package com.mrathena.jedis.sentinel;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.junit.Test;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisSentinelPool;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author mrathena on 2019-08-11 22:34
  */
 public class JedisSentinelTest {
+
+	@Test
+	public void t() {
+		List<String> configTagList = Arrays.asList("".split(","));
+		System.out.println(configTagList.size());
+		System.out.println(CollectionUtils.isEmpty(configTagList));
+	}
 
 	@Test
 	public void test() {
