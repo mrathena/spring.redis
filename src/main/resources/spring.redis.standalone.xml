@@ -15,8 +15,8 @@
 
 	<bean id="redisStandaloneConfiguration"
 		  class="org.springframework.data.redis.connection.RedisStandaloneConfiguration">
-		<constructor-arg name="hostName" value="${spring.redis.master.host}"/>
-		<constructor-arg name="port" value="${spring.redis.master.port}"/>
+		<constructor-arg name="hostName" value="${spring.redis.host}"/>
+		<constructor-arg name="port" value="${spring.redis.port}"/>
 		<property name="database" value="${spring.redis.database}"/>
 		<property name="password">
 			<!--这里的of本不应该报红的-->
@@ -32,12 +32,16 @@
 		<constructor-arg name="standaloneConfig" ref="redisStandaloneConfiguration"/>
 	</bean>
 
+	<bean id="keySerializer" class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+	<bean id="valueSerializer" class="org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer"/>
+
 	<!--RedisTemplate继承于RedisAccessor,需要配置一个RedisConnectionFactory-->
 	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
 		<property name="connectionFactory" ref="jedisConnectionFactory"/>
-		<property name="defaultSerializer">
-			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
-		</property>
+		<property name="keySerializer" ref="keySerializer"/>
+		<property name="valueSerializer" ref="valueSerializer"/>
+		<property name="hashKeySerializer" ref="keySerializer"/>
+		<property name="hashValueSerializer" ref="valueSerializer"/>
 	</bean>
 
 	<bean id="stringRedisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">

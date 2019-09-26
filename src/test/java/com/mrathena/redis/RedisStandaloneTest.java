@@ -23,6 +23,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author mrathena on 2019/8/2 16:34
@@ -74,7 +75,10 @@ public class RedisStandaloneTest {
 
 	@Test
 	public void test() {
+		stringObjectValueOperations.set(K, new Date(), 10000, TimeUnit.MILLISECONDS);
+		System.out.println(stringStringValueOperations.get(K));
 		System.out.println(stringObjectValueOperations.get(K));
+		stringStringValueOperations.set(K, "a");
 		System.out.println(stringStringValueOperations.get(K));
 	}
 
@@ -130,6 +134,7 @@ public class RedisStandaloneTest {
 		// 支持自增自减操作
 		// 只支持String类型,用起来并不方便,需要手动把value转成string,不然set和get都会类转换异常
 		// RedisTemplate和StringRedisTemplate数据是互通的,想想也是通的,网上都是胡说八道
+		// 不过互通不代表能互用,用StringRedisTemplate存的数据用RedisTemplate取可能报错,因为序列化反序列化的机制不同
 	}
 
 	@Test
@@ -156,6 +161,8 @@ public class RedisStandaloneTest {
 		stringObjectValueOperations.set(K, "你好啊");
 		System.out.println(stringObjectValueOperations.get(K));
 		System.out.println(stringObjectValueOperations.get(K).getClass());
+		System.out.println(stringStringValueOperations.get(K));
+		stringStringValueOperations.set(K, "我不好");
 		System.out.println(stringStringValueOperations.get(K));
 		System.out.println();
 		stringObjectValueOperations.set(K, data);
