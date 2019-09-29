@@ -13,10 +13,9 @@
 		<property name="testOnBorrow" value="true"/>
 	</bean>
 
-	<bean id="redisStandaloneConfiguration"
-		  class="org.springframework.data.redis.connection.RedisStandaloneConfiguration">
-		<constructor-arg name="hostName" value="${spring.redis.host}"/>
-		<constructor-arg name="port" value="${spring.redis.port}"/>
+	<bean id="redisStandaloneConfiguration" class="org.springframework.data.redis.connection.RedisStandaloneConfiguration">
+		<constructor-arg name="hostName" value="${spring.redis.standalone.host}"/>
+		<constructor-arg name="port" value="${spring.redis.standalone.port}"/>
 		<property name="database" value="${spring.redis.database}"/>
 		<property name="password">
 			<!--这里的of本不应该报红的-->
