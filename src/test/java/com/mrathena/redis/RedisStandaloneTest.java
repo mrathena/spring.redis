@@ -6,6 +6,7 @@ import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mrathena.spring.redis.serializer.CustomFastJsonRedisSerializer;
 import com.mrathena.spring.redis.serializer.CustomKryoRedisSerializer;
@@ -74,7 +75,7 @@ public class RedisStandaloneTest {
 	}
 
 	@Test
-	public void test() {
+	public void test() throws JsonProcessingException {
 		stringObjectValueOperations.set(K, new Date(), 10000, TimeUnit.MILLISECONDS);
 		System.out.println(stringStringValueOperations.get(K));
 		System.out.println(stringObjectValueOperations.get(K));
